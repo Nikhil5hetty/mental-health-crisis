@@ -1,0 +1,51 @@
+name: Option A Qwen3Guard smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "experiments/option_a/run_qwen3guard_bhh.py"
+      - "experiments/option_a/requirements.txt"
+      - ".github/workflows/option-a-qwen-smoke.yml"
+
+jobs:
+  qwen-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache Hugging Face model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: qwen3guard-gen-06b-v1
+
+      - name: Install dependencies
+        run: pip install -r experiments/option_a/requirements.txt
+
+      - name: Run deterministic smoke test
+        env:
+          TOKENIZERS_PARALLELISM: "false"
+        run: |
+          python experiments/option_a/run_qwen3guard_bhh.py \
+            --model Qwen/Qwen3Guard-Gen-0.6B \
+            --n-per-class 4 \
+            --seed 42 \
+            --max-new-tokens 32 \
+            --output results/option_a_qwen_smoke.json
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: option-a-qwen-smoke-results
+          path: results/option_a_qwen_smoke.json
+          if-no-files-found: warn
