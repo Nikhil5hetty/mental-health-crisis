@@ -1,5 +1,7 @@
 # Verily Research Data / Code Request
 
+Paper: [Nelson et al. (2026), *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*](https://doi.org/10.1038/s41746-026-02579-5)
+
 ## Requested artifacts
 
 ### 1. Verily Mental Health Crisis Dataset v1.0
@@ -47,7 +49,7 @@ Dear Dr. Nelson,
 
 I am a master's student working on a seminar project examining the robustness of LLM safety systems for mental-health crisis detection across datasets and conversational contexts.
 
-Your 2026 npj Digital Medicine paper, “An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations,” is one of the two primary studies forming the basis of our work.
+Your 2026 npj Digital Medicine paper, [“An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations”](https://doi.org/10.1038/s41746-026-02579-5), is one of the two primary studies forming the basis of our work.
 
 The paper states that the study data and code are available upon researcher request. We would be grateful if you could share, subject to any applicable research-use agreement:
 
