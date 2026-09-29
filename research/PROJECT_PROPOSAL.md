@@ -3,6 +3,10 @@
 ## Working title
 **Evaluating LLM Safety Systems for Mental Health Crisis Detection Across Datasets and Conversational Contexts**
 
+## Foundation papers
+- [Nelson et al. (2026), *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*](https://doi.org/10.1038/s41746-026-02579-5)
+- [Arnaiz-Rodriguez et al. (2026), *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*](https://doi.org/10.2196/88435)
+
 ## Motivation
 Recent work has examined psychiatric-crisis detection through both specialized guardrails and general-purpose LLMs. Two important gaps remain: cross-dataset generalization and longitudinal/multi-turn detection.
 
@@ -39,7 +43,7 @@ Excluded initially:
 ## Datasets
 - BHH expert-labelled validation subset (n=206)
 - BHH test subset (n=2,046)
-- AEGIS2.0 compatible subset
+- [AEGIS2.0](https://aclanthology.org/2025.naacl-long.306/) compatible subset
 - Verily Mental Health Crisis Dataset v1.0 (n=1,800), if granted
 - Verily clinician-reviewed NVIDIA subset (n=794), if granted
 
