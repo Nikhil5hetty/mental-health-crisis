@@ -1,6 +1,6 @@
 # References
 
-Every paper below links directly to the paper or publisher record.
+Every paper reference in this project should link directly to the paper or publisher record.
 
 1. [Nelson, B. W. et al. (2026). **An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations.** npj Digital Medicine, 9, 407.](https://doi.org/10.1038/s41746-026-02579-5)
 2. [Arnaiz-Rodriguez, A. et al. (2026). **Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models.** JMIR Mental Health, 13, e88435.](https://doi.org/10.2196/88435)
@@ -11,7 +11,6 @@ Every paper below links directly to the paper or publisher record.
 7. [Singh, V. et al. (2026). **Nemotron 3.5 Content Safety Moderator: A Compact Multimodal, Multilingual, and Reasoning Enabled Content Safety Moderator.**](https://arxiv.org/abs/2608.27548)
 
 ## Reproducibility resources
-
 - [Between Help and Harm — public GitHub repository](https://github.com/ellisalicante/LLMs-Mental-Health-Crisis)
 - [Between Help and Harm — Hugging Face benchmark](https://huggingface.co/datasets/arnaiztech/llms-mental-health-crisis-benchmark)
 - [Between Help and Harm — Hugging Face collection](https://huggingface.co/collections/arnaiztech/llm-mental-health-crisis)
