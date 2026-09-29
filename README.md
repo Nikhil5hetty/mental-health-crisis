@@ -10,8 +10,8 @@ This seminar project studies how reliably LLM safety systems identify mental-hea
 2. **Context-aware / multi-turn detection** — whether accumulating conversational context improves the accuracy, timing, and stability of crisis detection.
 
 The project is motivated by:
-- Nelson et al. (2026), *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*.
-- Arnaiz-Rodriguez et al. (2026), *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*.
+- [Nelson et al. (2026), *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*](https://doi.org/10.1038/s41746-026-02579-5).
+- [Arnaiz-Rodriguez et al. (2026), *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*](https://doi.org/10.2196/88435).
 
 A core design principle is that the project should remain executable without request-only artifacts. Public datasets and open-weight guardrails form the baseline; Verily materials strengthen the study if access is granted.
 
@@ -43,7 +43,7 @@ At least one model/setup from *Between Help and Harm* for continuity.
 - NVIDIA NeMoGuard
 - Qwen3Guard-Gen-8B
 - Llama Guard family
-- optional Nemotron Content Safety Reasoning
+- optional Nemotron content-safety reasoning
 - optional OpenAI moderation baseline
 
 ### Mental-health-specific guardrail
@@ -80,6 +80,15 @@ Key measurements:
 - explicit-cue ablation
 - context-length ablation
 
+## Option A feasibility work
+The first reproducibility experiment is documented in [experiments/option_a/README.md](experiments/option_a/README.md).
+
+Using the public annotation artifacts from the *Between Help and Harm* repository, the paper's validation agreement was reproduced to rounding:
+- GPT-4o-mini: Cohen κ ≈ **0.645**
+- GPT-5-nano: Cohen κ ≈ **0.631**
+- Llama-4-Scout: Cohen κ ≈ **0.581**
+- Human-human mean pairwise Cohen κ ≈ **0.553**
+
 ## Repository structure
 ```
 mental-health-crisis/
@@ -88,34 +97,24 @@ mental-health-crisis/
 │   ├── PROJECT_PROPOSAL.md
 │   ├── LITERATURE_REVIEW.md
 │   ├── METHODOLOGY.md
+│   ├── REFERENCES.md
 │   └── VERILY_DATA_REQUEST.md
-├── data/
-│   ├── README.md
-│   ├── raw/
-│   └── processed/
-├── src/
 ├── experiments/
+│   └── option_a/
+│       ├── README.md
+│       └── reproduce_bhh_agreement.py
+├── data/
+│   └── README.md
+├── src/
 ├── notebooks/
 └── results/
 ```
 
-## Initial milestones
-1. Finalize the harmonized taxonomy and exclusion rules.
-2. Reproduce BHH-206 label processing and baseline analysis.
-3. Run two open guardrails on the harmonized BHH subset.
-4. Add at least one newer guardrail.
-5. Build an AEGIS-compatible external validation subset.
-6. Request Verily datasets and VMHG implementation.
-7. If access is granted, perform direct cross-dataset evaluation.
-8. Develop or recover a small multi-turn suicide/self-harm benchmark.
-9. Run context-length and detection-delay experiments.
-10. Complete failure analysis and final seminar report.
-
 ## Key references
-- Nelson, B. W. et al. (2026). *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*. **npj Digital Medicine**, 9, 407. https://doi.org/10.1038/s41746-026-02579-5
-- Arnaiz-Rodriguez, A. et al. (2026). *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*. **JMIR Mental Health**, 13, e88435. https://doi.org/10.2196/88435
-- Ghosh, S. et al. (2025). *AEGIS2.0: A Diverse AI Safety Dataset and Risks Taxonomy for Alignment of LLM Guardrails*. **NAACL 2025**.
-- Weilnhammer, V. et al. (2026). *A clinically validated framework for auditing AI chatbot behavior in mental health interactions*. **Nature Medicine**.
+- [Nelson, B. W. et al. (2026). *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*. npj Digital Medicine, 9, 407.](https://doi.org/10.1038/s41746-026-02579-5)
+- [Arnaiz-Rodriguez, A. et al. (2026). *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*. JMIR Mental Health, 13, e88435.](https://doi.org/10.2196/88435)
+- [Ghosh, S. et al. (2025). *AEGIS2.0: A Diverse AI Safety Dataset and Risks Taxonomy for Alignment of LLM Guardrails*. NAACL 2025.](https://aclanthology.org/2025.naacl-long.306/)
+- [Weilnhammer, V. et al. (2026). *A clinically validated framework for auditing AI chatbot behavior in mental health interactions*. Nature Medicine.](https://doi.org/10.1038/s41591-026-04577-2)
 
 ## Research ethics
 This repository is for model-safety research. Crisis examples should be handled as research data, not clinical advice or diagnostic outputs. Any new dataset involving human annotators, clinicians, or sensitive real-world conversations should follow the university's ethics and privacy requirements.
