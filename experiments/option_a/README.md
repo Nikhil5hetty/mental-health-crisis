@@ -140,3 +140,59 @@ gpt-5-nano      kappa ~= 0.6306    agreement ~= 72.90%
 llama-4-scout   kappa ~= 0.5810    agreement ~= 68.08%
 human-human     kappa ~= 0.5530    agreement ~= 65.86%
 ```
+
+
+## Qwen3Guard taxonomy feasibility finding
+
+The first extension uses [Qwen3Guard](https://arxiv.org/abs/2510.14276).
+
+Qwen3Guard's current safety taxonomy exposes a combined **Suicide & Self-Harm** category rather than separate suicide and self-harm labels. It does not expose a direct substance-misuse/withdrawal crisis category. Therefore the full five-class harmonized taxonomy cannot be evaluated against Qwen3Guard without inventing mappings.
+
+For the initial feasibility experiment, the comparison is intentionally restricted to the direct overlap:
+
+| BHH expert-consensus label | Qwen3Guard target |
+|---|---|
+| `suicidal_ideation` | `Suicide & Self-Harm` |
+| `self-harm` | `Suicide & Self-Harm` |
+| `no_crisis` | absence of `Suicide & Self-Harm` |
+
+The BHH expert-consensus validation file contains:
+- 94 `no_crisis`
+- 34 `suicidal_ideation`
+- 15 `self-harm`
+- 16 unresolved/null consensus labels
+- other crisis labels outside this Qwen smoke-test overlap
+
+Thus the full directly compatible binary subset is **143 records**: 49 positive and 94 negative.
+
+### Important semantic mismatch
+
+Even this binary mapping is not perfectly equivalent. BHH defines crisis categories clinically, while Qwen3Guard's safety category is oriented toward harmful content such as advocating, encouraging, or detailing self-harm/suicide. A user *expressing* suicidal ideation may therefore be clinically positive in BHH but not necessarily unsafe under Qwen3Guard's moderation policy.
+
+This is not a data-cleaning nuisance; it is a central research question:
+
+> Can general-purpose content-safety guardrails detect user crisis state, or are their taxonomies optimized for harmful-content intent rather than clinical crisis recognition?
+
+## Current executable smoke test
+
+`run_qwen3guard_bhh.py` implements this mapping.
+
+Because GitHub-hosted CI is CPU-only, the automated feasibility workflow uses **Qwen3Guard-Gen-0.6B** and a deterministic 12-record stratified smoke test (4 records each from no-crisis, suicidal ideation, and self-harm).
+
+If this passes end-to-end, the exact same pipeline can be scaled to:
+1. the full 143-record directly compatible subset;
+2. Qwen3Guard-Gen-8B on GPU compute.
+
+The smaller checkpoint is a pipeline feasibility check, not a substitute for the final 8B experiment.
+
+### GitHub Actions
+
+Workflow: `.github/workflows/option-a-qwen-smoke.yml`
+
+The workflow:
+1. installs the required Transformer stack;
+2. downloads Qwen3Guard-Gen-0.6B;
+3. downloads the public BHH human-consensus file;
+4. runs deterministic inference;
+5. writes `results/option_a_qwen_smoke.json`;
+6. uploads the result as a workflow artifact.
