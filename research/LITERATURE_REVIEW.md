@@ -1,7 +1,7 @@
 # Literature Review
 
 ## 1. Verily Mental Health Guardrail
-Nelson et al. (2026) frame psychiatric-crisis detection as a dedicated guardrail problem rather than generic moderation.
+[Nelson et al. (2026), *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*](https://doi.org/10.1038/s41746-026-02579-5) frame psychiatric-crisis detection as a dedicated guardrail problem rather than generic moderation.
 
 Key contributions:
 - clinician-informed crisis taxonomy
@@ -17,7 +17,7 @@ Availability:
 The paper states data and code are available upon researcher request.
 
 ## 2. Between Help and Harm
-Arnaiz-Rodriguez et al. (2026) examine both crisis classification and response handling.
+[Arnaiz-Rodriguez et al. (2026), *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*](https://doi.org/10.2196/88435) examine both crisis classification and response handling.
 
 Key contributions:
 - six-category crisis taxonomy
@@ -30,8 +30,13 @@ Key contributions:
 Relevance:
 The expert-labelled validation set is a strong public baseline for reproducible crisis-detection experiments.
 
+Public artifacts:
+- [Paper](https://doi.org/10.2196/88435)
+- [GitHub repository](https://github.com/ellisalicante/LLMs-Mental-Health-Crisis)
+- [Hugging Face benchmark](https://huggingface.co/datasets/arnaiztech/llms-mental-health-crisis-benchmark)
+
 ## 3. AEGIS2.0
-Ghosh et al. (2025) provide a broad AI-safety dataset and taxonomy:
+[Ghosh et al. (2025), *AEGIS2.0: A Diverse AI Safety Dataset and Risks Taxonomy for Alignment of LLM Guardrails*](https://aclanthology.org/2025.naacl-long.306/) provide a broad AI-safety dataset and taxonomy:
 - 34,248 human–LLM interaction samples
 - 12 top-level hazard categories
 - 9 finer-grained subcategories
@@ -40,7 +45,7 @@ Relevance:
 AEGIS connects general content-safety research with Verily's external validation setup.
 
 ## 4. SIM-VAIL
-Weilnhammer et al. (2026) provide a clinically validated multi-turn framework for auditing mental-health risks:
+[Weilnhammer et al. (2026), *A clinically validated framework for auditing AI chatbot behavior in mental health interactions*](https://doi.org/10.1038/s41591-026-04577-2) provide a clinically validated multi-turn framework for auditing mental-health risks:
 - 810 multi-turn conversations
 - 9 chatbots
 - 30 simulated user profiles
@@ -52,14 +57,15 @@ SIM-VAIL shows that mental-health risk can accumulate over conversational trajec
 
 ## 5. Newer guardrail families
 Relevant modern guardrails include:
-- Qwen3Guard
-- Llama Guard family
-- NVIDIA Nemotron content-safety reasoning models
+- [Qwen3Guard Technical Report](https://arxiv.org/abs/2510.14276)
+- [Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations](https://arxiv.org/abs/2312.06674)
+- [Nemotron 3.5 Content Safety Moderator](https://arxiv.org/abs/2608.27548)
 
 A seminar-scale project should prioritize diversity and reproducibility rather than maximizing model count.
 
 ## Research gap
 A coherent remaining gap is:
+
 **How robustly do safety systems detect mental-health crises when dataset construction, taxonomy, and conversational context change?**
 
 This motivates:
