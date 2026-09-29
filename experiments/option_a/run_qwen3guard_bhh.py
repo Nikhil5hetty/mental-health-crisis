@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Qwen3Guard feasibility smoke test on the BHH-206 expert-consensus dataset.
+"""Qwen3Guard feasibility smoke test on the BHH-206 expert-consensus dataset.\n\nCI note: this script is intentionally small enough for a CPU smoke test.
 
 Primary purpose:
 - Verify that an open guardrail can be run end-to-end on the public BHH data.
