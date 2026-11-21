@@ -5,3 +5,6 @@ data/.staging/
 __pycache__/
 *.pyc
 .env
+data/processed/
+results/cache/
+.pytest_cache/
