@@ -60,3 +60,11 @@ D11 clarification (user approved): match literal plus signs using
 - Under D11's ordered comparisons, assert sampled answer item 22 as
   `near_identical` and item 124 as `normalised`. The original D11 wording above
   remains verbatim for audit history.
+
+### Numbered rulings (synced 2026-11-21, after the RQ1/demo plan commit)
+
+| ID | Decision |
+|---|---|
+| D13 | Missing LLM crisis labels (27 empty labels across 21 items in the 9 validation runs) stay missing and are never read as no_crisis. Crisis degree = k_crisis / n_observed; n_observed is stored per item (minimum 6 of 9). |
+| D14 | Non-string text artefacts: answer_text is null, with artefact_type and artefact_value columns. Original strings are kept unchanged. |
+| D15 | RQ2 rulings: verdicts use paired-difference CIs vs S2; identical systems stay "inconclusive"; the added M3b/M5 paired differences are accepted as deviations; the 10 hypothesis comparisons are reported as exploratory (no multiplicity correction). |

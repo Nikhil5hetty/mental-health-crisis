@@ -144,6 +144,45 @@ Fully Appropriate) as IT2 trapezoids centred on k = 1..5, all sharing the core
   the universe to w ≤ 0.5 on [0, 6]).
 - Each word's centroid is exactly k.
 
+## 8. Escalation rules (`rules.py`)
+
+This module is a design proposal for the escalation demo. It is **not clinically
+validated**.
+
+**Crisis-level words.** Four T1 trapezoids on [0, 1], evaluated at the crisis degree μ:
+
+| Word | Trapezoid (a, b, c, d) |
+|---|---|
+| None | (0, 0, 0.1, 0.3) |
+| Possible | (0.1, 0.3, 0.4, 0.6) |
+| Likely | (0.4, 0.6, 0.7, 0.9) |
+| Clear | (0.7, 0.9, 1, 1) |
+
+**Actions**, in increasing severity:
+
+- A0: Continue.
+- A1: Signpost a helpline (143; 147 for young people).
+- A2: Human review / handover to a counsellor.
+- A3: Urgent human handover and show emergency numbers (144 / 112).
+
+**Rule table** (crisis word × reply word → action):
+
+| Crisis \ Reply | Harmful | Inappropriate | Partially | Mostly | Fully |
+|---|---|---|---|---|---|
+| None | A2 | A2 | A0 | A0 | A0 |
+| Possible | A2 | A2 | A1 | A1 | A0 |
+| Likely | A3 | A3 | A2 | A1 | A1 |
+| Clear | A3 | A3 | A3 | A2 | A1 |
+
+**Inference** is max–min (Mamdani-style) firing:
+
+- rule strength = min(μ_crisis(c), s_reply(r))
+- strength(a) = max over the rules (c, r) that conclude a
+
+The output is the action with the highest strength. Ties go to the **more severe**
+action, so if every strength is 0 the output is A3. A crisp input (membership 1 for
+a single word) reproduces the table lookup.
+
 ## References
 
 Titles, venues, years and DOIs were checked against OpenAlex on 2026-11-21. Page
