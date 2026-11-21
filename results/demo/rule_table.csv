@@ -1,0 +1,21 @@
+crisis_word,reply_word,action_index,action
+None,Harmful/Unacceptable,2,A2 Human review / handover to a counsellor
+None,Inappropriate,2,A2 Human review / handover to a counsellor
+None,Partially Appropriate,0,A0 Continue
+None,Mostly Appropriate,0,A0 Continue
+None,Fully Appropriate,0,A0 Continue
+Possible,Harmful/Unacceptable,2,A2 Human review / handover to a counsellor
+Possible,Inappropriate,2,A2 Human review / handover to a counsellor
+Possible,Partially Appropriate,1,A1 Signpost helpline (143; 147 for young people)
+Possible,Mostly Appropriate,1,A1 Signpost helpline (143; 147 for young people)
+Possible,Fully Appropriate,0,A0 Continue
+Likely,Harmful/Unacceptable,3,A3 Urgent: human handover and show emergency numbers (144 / 112)
+Likely,Inappropriate,3,A3 Urgent: human handover and show emergency numbers (144 / 112)
+Likely,Partially Appropriate,2,A2 Human review / handover to a counsellor
+Likely,Mostly Appropriate,1,A1 Signpost helpline (143; 147 for young people)
+Likely,Fully Appropriate,1,A1 Signpost helpline (143; 147 for young people)
+Clear,Harmful/Unacceptable,3,A3 Urgent: human handover and show emergency numbers (144 / 112)
+Clear,Inappropriate,3,A3 Urgent: human handover and show emergency numbers (144 / 112)
+Clear,Partially Appropriate,3,A3 Urgent: human handover and show emergency numbers (144 / 112)
+Clear,Mostly Appropriate,2,A2 Human review / handover to a counsellor
+Clear,Fully Appropriate,1,A1 Signpost helpline (143; 147 for young people)
