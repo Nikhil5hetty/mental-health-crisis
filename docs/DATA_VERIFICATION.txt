@@ -1,0 +1,206 @@
+Published dataset verification (read-only)
+PASS (observed) reports measurements without a fixed expected value; FAIL never modifies files.
+
+PASS manifest paths unique: actual=418; expected=418
+PASS raw files missing from manifest: actual=[]; expected=[]
+PASS manifest files missing on disk: actual=[]; expected=[]
+PASS between_help_and_harm fetch status: actual='fetched'; expected='fetched'
+PASS between_help_and_harm manifest has files: actual=True; expected=True
+PASS between_help_and_harm size/SHA-256 mismatches (393 files): actual=[]; expected=[]
+PASS between_help_and_harm unresolved LFS pointers: actual=[]; expected=[]
+PASS (observed) between_help_and_harm published bytes (archives and extracted members both counted): actual=1155029236; no fixed expectation
+PASS counselbench fetch status: actual='fetched'; expected='fetched'
+PASS counselbench manifest has files: actual=True; expected=True
+PASS counselbench size/SHA-256 mismatches (9 files): actual=[]; expected=[]
+PASS counselbench unresolved LFS pointers: actual=[]; expected=[]
+PASS (observed) counselbench published bytes (archives and extracted members both counted): actual=6728043; no fixed expectation
+PASS mentalalign fetch status: actual='fetched'; expected='fetched'
+PASS mentalalign manifest has files: actual=True; expected=True
+PASS mentalalign size/SHA-256 mismatches (12 files): actual=[]; expected=[]
+PASS mentalalign unresolved LFS pointers: actual=[]; expected=[]
+PASS (observed) mentalalign published bytes (archives and extracted members both counted): actual=253331950; no fixed expectation
+PASS mentalhealthbench fetch status: actual='fetched'; expected='fetched'
+PASS mentalhealthbench manifest has files: actual=True; expected=True
+PASS mentalhealthbench size/SHA-256 mismatches (4 files): actual=[]; expected=[]
+PASS mentalhealthbench unresolved LFS pointers: actual=[]; expected=[]
+PASS (observed) mentalhealthbench published bytes (archives and extracted members both counted): actual=8602913; no fixed expectation
+
+CounselBench
+PASS (observed) CounselBench-Eval columns: actual=['questionID', 'questionTitle', 'questionText', 'response', 'topic', 'responder', 'survey_id', 'overall_score', 'overall_reason', 'empathy_score', 'specificity_score', 'medical_advice_score', 'medical_copy', 'medical_reason', 'factual_consistency_score', 'factual_copy', 'factual_reason', 'toxicity_score', 'toxicity_copy', 'toxicity_reason']; no fixed expectation
+PASS CounselBench-Eval shape: actual=(2000, 20); expected=(2000, 20)
+PASS CounselBench-Eval unique questionID: actual=100; expected=100
+PASS CounselBench-Eval responders: actual=['gemini', 'gpt4', 'human', 'llama3']; expected=['gemini', 'gpt4', 'human', 'llama3']
+PASS CounselBench-Eval medical_advice_score counts: actual={'No': 1729, 'Yes': 220, 'I am not sure': 51}; expected={'No': 1729, 'Yes': 220, 'I am not sure': 51}
+PASS CounselBench-Eval factual_consistency_score 'I am not sure': actual=70; expected=70
+PASS CounselBench-Eval question/responder groups: actual=400; expected=400
+PASS CounselBench-Eval rows per group distribution: actual={5: 400}; expected={5: 400}
+Rows per (questionID, responder); each cell must be 5 (one row per expert):
+PASS   questionID_139: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_144: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_146: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_160: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_168: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_229: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_249: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_250: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_26: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_261: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_262: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_289: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_307: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_308: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_310: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_315: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_346: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_355: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_356: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_358: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_387: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_388: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_390: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_391: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_392: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_394: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_401: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_411: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_419: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_420: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_430: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_432: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_436: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_437: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_444: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_448: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_451: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_452: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_464: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_466: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_475: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_478: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_51: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_601: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_603: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_610: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_611: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_612: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_614: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_616: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_619: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_623: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_624: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_627: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_630: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_654: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_675: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_684: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_692: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_694: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_702: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_704: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_707: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_708: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_711: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_712: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_713: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_714: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_715: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_717: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_727: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_732: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_75: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_754: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_76: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_859: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_862: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_872: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_876: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_877: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_884: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_885: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_886: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_887: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_892: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_895: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_896: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_897: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_898: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_901: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_913: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_914: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_917: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_921: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_924: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_933: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_935: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_936: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_938: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS   questionID_939: actual={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}; expected={'gemini': 5, 'gpt4': 5, 'human': 5, 'llama3': 5}
+PASS (observed) CounselBench-Adv columns: actual=['apathetic', 'assumptions', 'symptoms', 'judgmental', 'medication', 'therapy']; no fixed expectation
+PASS (observed) CounselBench-Adv rows: actual=20; no fixed expectation
+PASS (observed) CounselBench-Adv-human-annotation columns: actual=['mode', 'example_post', 'example_response', 'comment_1', 'comment_2', 'new_post', 'model_name', 'new_response', 'question', 'human_answer']; no fixed expectation
+PASS (observed) CounselBench-Adv-human-annotation rows: actual=1080; no fixed expectation
+
+Between Help and Harm
+PASS human_label/H1_labeled_n206_s42.json records: actual=206; expected=206
+PASS human_label/H2_labeled_n206_s42.json records: actual=206; expected=206
+PASS human_label/H3_labeled_n206_s42.json records: actual=206; expected=206
+PASS human_label/H4_labelled_n206_s42.json records: actual=206; expected=206
+PASS human_label/H1_scores_n206_s42.json records: actual=206; expected=206
+PASS human_label/H2_scores_n206_s42.json records: actual=206; expected=206
+PASS (observed) validation aggregate label files (not independent runs): actual=['gpt-4o-mini-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-merged_labels.json']; no fixed expectation
+PASS validation-set LLM label files: actual=9; expected=9
+PASS llm_label/gpt-4o-mini-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250818-164149.json records: actual=206; expected=206
+PASS llm_label/gpt-4o-mini-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250819-120514.json records: actual=206; expected=206
+PASS llm_label/gpt-4o-mini-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250819-121533.json records: actual=206; expected=206
+PASS llm_label/gpt-5-nano-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250819-122630.json records: actual=206; expected=206
+PASS llm_label/gpt-5-nano-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250819-123814.json records: actual=206; expected=206
+PASS llm_label/gpt-5-nano-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250819-124909.json records: actual=206; expected=206
+PASS llm_label/meta-llama-Llama-4-Scout-17B-16E-Instruct-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250820-130636.json records: actual=206; expected=206
+PASS llm_label/meta-llama-Llama-4-Scout-17B-16E-Instruct-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250820-130838.json records: actual=206; expected=206
+PASS llm_label/meta-llama-Llama-4-Scout-17B-16E-Instruct-labeled-sampled_dataset_n_200_merged_n50-noSeed_156-s42-20250820-131430.json records: actual=206; expected=206
+PASS validation LLM files per model: actual={'gpt-4o-mini': 3, 'gpt-5-nano': 3, 'meta-llama-Llama-4-Scout-17B-16E-Instruct': 3}; expected={'gpt-4o-mini': 3, 'gpt-5-nano': 3, 'meta-llama-Llama-4-Scout-17B-16E-Instruct': 3}
+PASS llm_evaluator/sampled/sampled_lowest_scores_n200__jury.json records: actual=206; expected=206
+PASS (observed) jury llm_evaluations keys: actual=['gpt-4o-mini', 'gpt-5-nano', 'meta-llama']; no fixed expectation
+PASS jury records with unexpected evaluator keys: actual=[]; expected=[]
+PASS (observed) protocol crisis categories (rows): actual=['suicidal_ideation', 'self-harm', 'anxiety_crisis', 'violent_thoughts', 'substance_abuse_or_withdrawal', 'risk_taking_behaviours', 'no_crisis']; no fixed expectation
+PASS (observed) protocol level columns: actual=['(1) Harmful / Unacceptable', '(2) Inappropriate', '(3) Partially Appropriate', '(4) Mostly Appropriate', '(5) Fully Appropriate']; no fixed expectation
+PASS protocol level count: actual=5; expected=5
+PASS human input sequences aligned: actual=True; expected=True
+PASS unknown human labels: actual=[]; expected=[]
+PASS messages labelled crisis by 0/1/2/3/4 humans: actual={0: 36, 1: 33, 2: 33, 3: 26, 4: 78}; expected={0: 36, 1: 33, 2: 33, 3: 26, 4: 78}
+
+MentalAlign
+PASS MentalAlign analysis CSV files: actual=4; expected=4
+PASS claude_llm_judge_with_human.csv shape: actual=(1000, 22); expected=(1000, 22)
+PASS gemini_llm_judge_with_human.csv shape: actual=(1000, 22); expected=(1000, 22)
+PASS gpt-4o_llm_judge_with_human.csv shape: actual=(1000, 22); expected=(1000, 22)
+PASS o4-mini_llm_judge_with_human.csv shape: actual=(1000, 22); expected=(1000, 22)
+PASS Human_judge.xlsx shape: actual=(1000, 12); expected=(1000, 12)
+PASS (observed) Human_judge.xlsx exact columns (including published whitespace): actual=['ConvID', 'context', 'human_response_original', ' human_response_claude', ' human_response_ds_llama', ' human_response_ds_qwen', 'human_response_gemini', ' human_response_gpt4o', ' human_response_gpt4omini', ' human_response_llama_3', 'human_response_qwen_2', 'human_response_qwen_3']; no fixed expectation
+PASS human Safety unreadable cells (Excel row, column): actual=[]; expected=[]
+PASS (observed) human Safety missing/JSON-null scores: actual=59; no fixed expectation
+PASS (observed) human Safety scores parsed: actual=9941; no fixed expectation
+PASS (observed) human Safety scores outside 1–5 (known issue; unchanged): actual=34; no fixed expectation
+PASS (observed) human Safety score distribution: actual={0: 33, 1: 98, 2: 60, 3: 419, 4: 1027, 5: 8303, 6: 1}; no fixed expectation
+PASS Office lock files copied: actual=[]; expected=[]
+PASS MentalBench archive retained: actual=True; expected=True
+PASS MentalBench extracted files present: actual=True; expected=True
+PASS (observed) MentalBench extracted files: actual=['MentalBench-100k_extracted/MentalBench-100k.csv', 'MentalBench-100k_extracted/__MACOSX/._MentalBench-100k.csv']; no fixed expectation
+
+MentalHealthBench
+PASS MentalHealthBench JSONL files: actual=1; expected=1
+PASS MentalHealthBench README present: actual=True; expected=True
+PASS MentalHealthBench LICENSE present: actual=True; expected=True
+PASS MentalHealthBench official archive retained: actual=True; expected=True
+PASS MentalHealthBench conversations: actual=1215; expected=1215
+PASS MentalHealthBench rubric criteria: actual=5262; expected=5262
+PASS MentalHealthBench acuity counts: actual={'non_acute': 650, 'emergent': 344, 'high_acuity': 221}; expected={'non_acute': 650, 'high_acuity': 221, 'emergent': 344}
+PASS (observed) MentalHealthBench language counts: actual={'ar': 34, 'de': 25, 'en': 903, 'es': 105, 'fa': 17, 'hi': 54, 'id': 17, 'it': 17, 'pt': 29, 'tr': 13, 'zh': 1}; no fixed expectation
+PASS (observed) MentalHealthBench exact JSON fields at every object path: actual={'[]': ['acuity', 'canary_string', 'conversation', 'has_prior_context', 'id', 'language', 'rubric_items', 'user_profile'], '[].conversation': ['messages'], '[].conversation.messages[]': ['content', 'role'], '[].rubric_items[]': ['behavior_axis', 'criterion_text', 'points']}; no fixed expectation
+PASS MentalHealthBench published schema: actual={'[]': ['acuity', 'canary_string', 'conversation', 'has_prior_context', 'id', 'language', 'rubric_items', 'user_profile'], '[].conversation': ['messages'], '[].conversation.messages[]': ['content', 'role'], '[].rubric_items[]': ['behavior_axis', 'criterion_text', 'points']}; expected={'[]': ['acuity', 'canary_string', 'conversation', 'has_prior_context', 'id', 'language', 'rubric_items', 'user_profile'], '[].conversation': ['messages'], '[].conversation.messages[]': ['content', 'role'], '[].rubric_items[]': ['behavior_axis', 'criterion_text', 'points']}
+PASS MentalHealthBench model target responses present: actual=False; expected=False
+PASS MentalHealthBench grader outputs present: actual=False; expected=False
+PASS MentalHealthBench per-expert votes present: actual=False; expected=False
+PASS (observed) MentalHealthBench assistant turns in conversation context (not target responses): actual=3345; no fixed expectation
+
+Verification summary: PASS=192, FAIL=0
