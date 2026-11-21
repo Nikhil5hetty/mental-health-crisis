@@ -1,0 +1,7 @@
+data/raw/
+data/external_repos/
+data/.staging/
+.venv/
+__pycache__/
+*.pyc
+.env
