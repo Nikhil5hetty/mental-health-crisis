@@ -1,0 +1,137 @@
+\section{Background and Related Work}
+\label{sec:background}
+
+This section introduces the four strands of work that the paper connects.
+Section~\ref{sec:bg-cww} summarises Computing with Words and the \Perc{}.
+Section~\ref{sec:bg-judges} reviews how large language models are used to judge mental-health replies.
+Section~\ref{sec:bg-disagreement} presents the view that rater disagreement is information rather than noise.
+Section~\ref{sec:bg-cities} places the work in research on cognitive cities and in the practice of public crisis services.
+
+\subsection{Computing with Words and the Perceptual Computer}
+\label{sec:bg-cww}
+
+\emph{Computing with Words} (CWW) is a methodology in which the objects of computation are words and propositions drawn
+from natural language rather than numbers \citep{zadeh1996fuzzy}.
+Zadeh motivates CWW by two observations: much of the information people use is too imprecise to justify numbers, and
+tolerance for imprecision can be exploited to obtain tractable and robust solutions.
+In this view, a word is modelled as a fuzzy set: a set whose elements belong to it to a degree between zero and one.
+
+The \emph{\Perc{}} (Per-C) is an architecture that makes CWW operational for subjective judgements
+\citep{mendel2001perceptual,mendel2010perceptual}.
+It consists of three components.
+An \emph{encoder} transforms words into fuzzy-set models that are collected in a \emph{codebook}.
+A \emph{CWW engine} computes with these models, for example by aggregation or by if--then rules.
+A \emph{decoder} maps the engine output back to a word, a rank or a class that a person can act on.
+The design goal is that the output of the Per-C should be useful to, and interpretable by, a human decision maker.
+
+Mendel argues that word models should be \emph{interval type-2 fuzzy sets} (IT2 FSs) because words mean different
+things to different people \citep{mendel2007computing}.
+A type-1 fuzzy set assigns each element a single membership grade.
+An IT2 FS instead assigns each element an interval of grades, bounded below by a \emph{lower membership function}
+(LMF) and above by an \emph{upper membership function} (UMF).
+The region between the two is the \emph{footprint of uncertainty} (FOU); its width expresses how much people disagree
+about the word.
+IT2 FSs are therefore a natural representation when the uncertainty of interest is disagreement between raters.
+
+Mendel also proposes three principles for validating CWW \citep{mendel2007computing}.
+Following Turing, a CWW system should be judged by whether its output is indistinguishable from that of human experts.
+Following Popper, a word model should be open to refutation by data about how people use the word, which favours models
+that are estimated from such data and that represent its uncertainty.
+Following Occam, the simplest word model and engine that pass the validation should be preferred.
+A later forum of leading CWW researchers showed that the field holds several complementary views of what CWW means
+\citep{mendel2010means}.
+This paper adopts Mendel's engineering view: CWW as a Per-C that supports a human judgement.
+
+The CWW engines used in this paper come from the Per-C literature.
+The \emph{ordered weighted average} (OWA) aggregates values after sorting them, so that its weights express an
+attitude between pessimism (emphasising the smallest values) and optimism \citep{yager1988owa}.
+The \emph{fuzzy weighted average} (FWA) generalises the weighted average to fuzzy inputs and weights by computing it on
+each $\alpha$-cut with the Karnik--Mendel algorithms \citep{liu2008fwa}.
+The \emph{linguistic weighted average} (LWA) extends the FWA to IT2 inputs and IT2 weights \citep{wu2007lwa}.
+Decoders typically compare the engine output with each codebook word by the \emph{Jaccard similarity} of IT2 FSs, and
+summarise an IT2 FS by its \emph{centroid}, an interval computed with the (Enhanced) Karnik--Mendel algorithms
+\citep{karnik2001centroid,wu2009ekm,wu2009comparative}.
+A complementary decoder is the \emph{2-tuple} representation, which reports a word together with a signed offset that
+keeps the information lost by rounding to the nearest word \citep{herrera2000twotuple}.
+
+\subsection{LLMs as Judges of Mental-Health Replies}
+\label{sec:bg-judges}
+
+\emph{LLM-as-a-judge} denotes the use of a large language model (LLM) to rate the output of another system, usually
+in place of human raters \citep{zheng2023judging}.
+Because a single judge can be biased and inconsistent, several studies aggregate a \emph{jury} of different LLM
+judges, typically by averaging or voting \citep{verga2024juries}.
+In mental health, the judge's verdict effectively decides which replies count as safe, so its reliability is a safety
+question rather than a matter of benchmark convenience.
+
+CounselBench provides large-scale expert evaluations of answers by LLMs and by online human therapists to real patient
+questions, rated by mental-health professionals on six clinically grounded dimensions \citep{li2026counselbench}.
+Its authors report that LLM judges systematically overrate model answers and overlook safety concerns that human
+experts identify, most notably unauthorised medical advice.
+Badawi et al.\ study, with large-scale benchmarks, when LLM judges can be trusted to evaluate mental-health replies,
+including the agreement between LLM and human ratings \citep{badawi2026trust}.
+
+\emph{Between Help and Harm} (BHH) addresses crisis handling directly \citep{arnaizrodriguez2026help}.
+It introduces a clinically informed taxonomy of six crisis categories, a validation set of user messages labelled by
+human annotators and by LLMs, and an expert-designed protocol that rates the appropriateness of a reply on a five-point
+scale from harmful to fully appropriate.
+Response quality in BHH is measured by an LLM-as-a-judge that the authors validated against human expert feedback.
+The present paper uses the published BHH validation data and the stored judge outputs, so that no new model calls are
+needed.
+
+Three further studies define the context of this paper without being analysed in it.
+MentalHealthBench is an open benchmark of realistic mental-health conversations built with licensed mental-health
+experts and scored against expert-written rubrics \citep{openai2026mentalhealthbench}.
+SIM-VAIL audits chatbots in multi-turn conversations with simulated users and shows that concerning behaviour
+accumulates over turns \citep{weilnhammer2026simvail}.
+The Verily Mental Health Guardrail is a dedicated crisis detector that prioritises sensitivity in order to minimise
+missed psychiatric crises \citep{nelson2026guardrail}.
+Together these studies show that safety evaluation is moving towards expert-grounded, multi-rater and multi-turn
+designs.
+
+A common pattern runs through this literature.
+Whenever several judges, several runs or several experts produce ratings, the ratings are reduced to a single number
+or label, usually a mean or a majority vote, before they are compared with a reference.
+The spread among the raters, which may indicate that a reply is ambiguous or risky, is discarded at that step.
+This paper asks what is gained when the spread is kept.
+
+\subsection{Disagreement as Signal}
+\label{sec:bg-disagreement}
+
+Research on annotation increasingly treats disagreement between raters as information rather than as noise.
+Uma et al.\ survey methods that learn from disagreement instead of resolving it into a single aggregated gold label
+\citep{uma2021learning}.
+Plank argues that human label variation is often genuine and that evaluation should account for it rather than assume a
+single ground truth \citep{plank2022problem}.
+Crisis assessment is a domain where such variation is expected: whether a message signals a crisis can depend on
+context that a rater does not have.
+
+The \emph{Interval Agreement Approach} (IAA) offers a principled way to keep disagreement inside a fuzzy set
+\citep{wagner2015iaa}.
+Each rater contributes an interval, and the membership of a value is the proportion of intervals that contain it.
+The IAA preserves both the variation between raters and the uncertainty within one rater, without assuming a
+parametric shape.
+Section~\ref{sec:concept} uses the IAA to encode panels of LLM judges, where the runs of one judge play the role of
+within-rater uncertainty.
+
+\subsection{Cognitive Cities and Public Crisis Services}
+\label{sec:bg-cities}
+
+\emph{Cognitive cities} extend the smart-city idea from efficient infrastructure to urban systems that learn and
+interact with their citizens \citep{finger2016cognitive}.
+In this line of work, soft computing and CWW are proposed as a way to let public services reason with the imprecise,
+linguistic information that citizens provide.
+D'Onofrio, M\"uller and Portmann describe a fuzzy reasoning process for conversational agents in cognitive cities,
+combining fuzzy inference with fuzzy cognitive maps \citep{donofrio2019fuzzy}.
+The present paper follows this direction for one specific public service: a crisis line that uses a chatbot.
+
+Public crisis services have begun to deploy conversational AI.
+In October 2026, the Swiss helpline Die Dargebotene Hand (telephone number 143) began to offer an AI chatbot in its
+online chat for people who cannot reach a human counsellor \citep{srf2026dargebotene}.
+The Dutch suicide-prevention line 113 Zelfmoordpreventie follows a different design: it uses AI only in chat
+conversations to support its counsellors, and it states that a helpline conversation always takes place with a human
+\citep{zelfmoordpreventie113hulplijn,vu2024aitool}.
+Both designs need a decision about when an automated reply is not enough and a person in crisis should be handed over
+to a human.
+The escalation decoder proposed in Section~\ref{sec:concept} is a concept for making that decision transparent and
+sensitive to disagreement.

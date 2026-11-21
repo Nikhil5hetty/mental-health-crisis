@@ -1,0 +1,190 @@
+\section{Concept: A Perceptual Computer for Safety Evaluation}
+\label{sec:concept}
+
+This section derives the system that the study evaluates.
+It instantiates the three Per-C components of Section~\ref{sec:bg-cww} for two inputs: the appropriateness scores that
+LLM judges give to a reply, and the crisis labels that raters give to the message the reply answers.
+Figure~\ref{fig:pipeline} shows the resulting pipeline; the formulas follow the project's method note, and the
+implementation is a numpy-only library described in Appendix~\ref{app:prototype}.
+
+\begin{figure}[t]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  node distance=5mm and 7mm,
+  box/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=11mm, text width=27mm},
+  io/.style={box, fill=black!6},
+  stage/.style={font=\footnotesize\bfseries},
+  arr/.style={-{Stealth[length=2mm]}}]
+  \node[io] (runs) {Judge runs\\ per reply};
+  \node[io, below=of runs] (labels) {Crisis labels\\ per message};
+  \node[box, right=of runs] (enc) {IAA panel encoder\\ (IT2 set)};
+  \node[box, right=of labels] (deg) {Crisis degree\\ $\mu = k/n$};
+  \node[box, right=of enc] (eng) {CWW engine\\ panel / OWA / LWA};
+  \node[box, right=of eng] (dec) {Decoder: codebook,\\ Jaccard, 2-tuple,\\ contested flag};
+  \node[box, below=of dec] (rules) {Max--min rule base\\ crisis level $\times$ reply word};
+  \node[io, right=of rules] (act) {Action\\ A0--A3};
+  \node[stage, above=1mm of enc] {Encoder};
+  \node[stage, above=1mm of eng] {Engine};
+  \node[stage, above=1mm of dec] {Decoder};
+  \draw[arr] (runs) -- (enc);
+  \draw[arr] (labels) -- (deg);
+  \draw[arr] (enc) -- (eng);
+  \draw[arr] (eng) -- (dec);
+  \draw[arr] (dec) -- (rules);
+  \draw[arr] (deg) -- (rules);
+  \draw[arr] (rules) -- (act);
+\end{tikzpicture}}
+\caption{The proposed \Perc{} for safety evaluation. The encoder keeps the disagreement between judges, runs and raters
+as fuzzy sets; the engine aggregates the judges; the decoder returns a word, a 2-tuple and a flag for contested
+verdicts; a rule base maps the crisis level and the reply word to one of four public-service actions.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Encoder}
+\label{sec:concept-encoder}
+
+All sets are sampled on the universe $X = [0, 6]$ with step $0.01$, which contains the five-point appropriateness scale
+with a margin.
+A single score $s$ is treated as the Likert bin $[s-0.5, s+0.5]$, the interval of values that round to $s$.
+
+\paragraph{Panel encoder.}
+Consider a panel of $J$ judges in which judge $j$ produced runs $r_{j1},\dots,r_{jm_j}$ for the same reply.
+Following the IAA \citep{wagner2015iaa}, the encoder builds an IT2 FS whose UMF counts judges and whose LMF counts runs:
+\begin{equation}
+  \overline{\mu}(x) = \frac{1}{J}\sum_{j=1}^{J} \mathbf{1}\!\left[x \in I_j\right], \qquad
+  I_j = \bigl[\min_r r_{jr} - 0.5,\ \max_r r_{jr} + 0.5\bigr],
+\end{equation}
+\begin{equation}
+  \underline{\mu}(x) = \frac{1}{J}\sum_{j=1}^{J} \frac{1}{m_j}\sum_{r=1}^{m_j} \mathbf{1}\!\left[x \in [r_{jr}-0.5,\ r_{jr}+0.5]\right].
+\end{equation}
+Every run bin of judge $j$ lies inside $I_j$, so $\underline{\mu} \le \overline{\mu}$ holds by construction, and the
+number of runs may differ between judges.
+The UMF expresses where at least some judges placed the reply; the LMF expresses how consistently each judge did so.
+When every rater gives a single score, as the human experts do, the LMF equals the UMF and the set reduces to the
+type-1 IAA of the score bins.
+
+\paragraph{Crisis degree.}
+For the crisis input, each rater gives a crisp label.
+If $k$ of the $n$ raters who gave a label chose a crisis category, the \emph{crisis degree} is $\mu = k/n$, which is the
+IAA membership of ``crisis'' \citep{wagner2015iaa}.
+Missing labels are not counted in $n$ (decision D13 in Appendix~\ref{app:decisions}).
+The crisp alternative is the majority label: crisis if $\mu > 1/2$, no crisis if $\mu < 1/2$, and a tie otherwise.
+
+\subsection{CWW Engine}
+\label{sec:concept-engine}
+
+The engine combines the judges of one reply.
+The study compares three CWW engines with crisp aggregation (Section~\ref{sec:design-systems}).
+
+\paragraph{Direct panel decoding.}
+The simplest engine passes the panel set of Section~\ref{sec:concept-encoder} directly to the decoder.
+It treats all judges equally and keeps their disagreement in the FOU.
+
+\paragraph{Ordered weighted average.}
+The OWA of values $a_1,\dots,a_n$ with weights $w_j \ge 0$, $\sum_j w_j = 1$, is
+$\mathrm{OWA}_w(a) = \sum_{j} w_j b_j$, where $b_j$ is the $j$-th largest value \citep{yager1988owa}.
+Its \emph{orness}, $\frac{1}{n-1}\sum_{j}(n-j)\,w_j$, is $1$ for the maximum, $1/2$ for the mean and $0$ for the
+minimum.
+We obtain weights with a prescribed orness $o$ by mixing the three reference operators linearly: for $o \ge 1/2$,
+$w = (2o-1)\,e_{\max} + (2-2o)\,u$; for $o < 1/2$, $w = (1-2o)\,e_{\min} + 2o\,u$, where $u$ is the uniform weight
+vector.
+An orness below one half gives more weight to the lowest scores, which is the safety-pessimistic attitude used in the
+study (orness $0.25$).
+
+\paragraph{Linguistic weighted average with self-consistency weights.}
+The LWA computes $\tilde{Y} = \sum_j \tilde{W}_j \tilde{X}_j / \sum_j \tilde{W}_j$ for IT2 inputs $\tilde{X}_j$ and IT2
+weights $\tilde{W}_j$ \citep{wu2007lwa}.
+Its UMF is the FWA of the input and weight UMFs, and its LMF is the FWA of the LMFs over $\alpha \in [0, h_{\min}]$,
+where $h_{\min}$ is the smallest LMF height.
+Each FWA is computed on $51$ $\alpha$-cuts: at every level $\alpha$, with cuts $X_j(\alpha)=[a_j,b_j]$ and
+$W_j(\alpha)=[c_j,d_j]$,
+\begin{equation}
+  y_L(\alpha) = \min_{w_j\in[c_j,d_j]} \frac{\sum_j w_j a_j}{\sum_j w_j}, \qquad
+  y_R(\alpha) = \max_{w_j\in[c_j,d_j]} \frac{\sum_j w_j b_j}{\sum_j w_j},
+\end{equation}
+which the Enhanced Karnik--Mendel (EKM) algorithm solves exactly \citep{liu2008fwa,wu2009ekm}.
+Here, $\tilde{X}_j$ is the panel set of judge $j$ alone.
+The weight $\tilde{W}_j$ is a reliability word chosen from the judge's own consistency on the reply: \word{High} if all
+its runs agree, \word{Medium} if they span one level, and \word{Low} if they span two or more.
+The weights therefore use no human data and could be computed in deployment.
+Table~\ref{tab:wordmodels} lists the weight words.
+
+\subsection{Decoder}
+\label{sec:concept-decoder}
+
+\paragraph{Codebook.}
+The codebook contains the five appropriateness levels of the BHH protocol, from \word{Harmful/Unacceptable} to
+\word{Fully Appropriate} \citep{arnaizrodriguez2026help}.
+Word $k \in \{1,\dots,5\}$ is an IT2 trapezoid with core $[k-0.25, k+0.25]$ and shoulders that reach to
+$k \pm 0.75$; the parameter $w$ moves the UMF feet outward and the LMF feet inward by $w/2$, so $w$ is the horizontal
+width of the FOU (Table~\ref{tab:wordmodels}).
+No survey of clinicians' interpretations of these words exists, so $w$ is a proxy; the study uses $w = 0.25$ and
+reports sensitivity to it.
+
+\begin{table}[t]
+\caption{Word models used by the decoder, the LWA weights and the escalation rule base. Trapezoids are given as
+$(a,b,c,d)$. The appropriateness words use the proxy FOU width $w = 0.25$.}
+\label{tab:wordmodels}
+\input{generated/tables/word_models}
+\end{table}
+
+\paragraph{Similarity and word.}
+The decoder compares the engine output $\tilde{Y}$ with every codebook word $\tilde{W}_k$ by the IT2 Jaccard
+similarity \citep{wu2009comparative}:
+\begin{equation}
+  s_J(\tilde{Y},\tilde{W}_k) =
+  \frac{\sum_x \min\bigl(\overline{\mu}_{\tilde{Y}},\overline{\mu}_{\tilde{W}_k}\bigr) + \min\bigl(\underline{\mu}_{\tilde{Y}},\underline{\mu}_{\tilde{W}_k}\bigr)}
+       {\sum_x \max\bigl(\overline{\mu}_{\tilde{Y}},\overline{\mu}_{\tilde{W}_k}\bigr) + \max\bigl(\underline{\mu}_{\tilde{Y}},\underline{\mu}_{\tilde{W}_k}\bigr)},
+\end{equation}
+and returns the word with the largest similarity.
+It also returns the centroid $[c_l, c_r]$ of $\tilde{Y}$, computed with EKM \citep{karnik2001centroid,wu2009ekm}; its
+centre $(c_l+c_r)/2$ is a numerical verdict and its width $c_r-c_l$ is an uncertainty measure.
+
+\paragraph{2-tuple.}
+For crisp aggregates the decoder uses the 2-tuple representation \citep{herrera2000twotuple}.
+A value $\beta$ on the index scale $\{0,\dots,g\}$ of the words maps to
+$\Delta(\beta) = (s_i, \alpha)$ with $i = \operatorname{round}(\beta)$ and $\alpha = \beta - i \in [-0.5, 0.5)$, where
+halves round up.
+The 2-tuple keeps the distance to the nearest word, so that, for example, a mean just below \word{Partially Appropriate}
+is reported with a negative offset instead of being silently rounded.
+
+\paragraph{Contested flag.}
+A decoded verdict is \emph{contested} if no word fits well or if two words fit almost equally well: the largest
+similarity is below $0.5$, or the gap between the two largest similarities is below $0.05$.
+A contested verdict can be routed to a stricter policy.
+The \emph{escalate-when-unsure} variant flags a reply as unsafe if its word is \word{Harmful/Unacceptable} or
+\word{Inappropriate}, or if it is contested and one of these two words is within $0.05$ of the largest similarity.
+
+\subsection{From Verdicts to Public-Service Actions}
+\label{sec:concept-rules}
+
+The last component turns two Per-C outputs into an action for a crisis service.
+It is a design proposal and has not been clinically validated.
+
+The crisis degree $\mu$ is described by four type-1 words, \word{None}, \word{Possible}, \word{Likely} and
+\word{Clear}, whose trapezoids cover $[0, 1]$ (Table~\ref{tab:wordmodels}).
+The reply is described by its similarities to the five appropriateness words.
+The possible actions, in increasing severity, are:
+A0, continue the conversation;
+A1, signpost a helpline (in Switzerland 143, or 147 for young people);
+A2, request human review or hand over to a counsellor;
+A3, urgent human handover and display of the emergency numbers 144 and 112.
+Table~\ref{tab:rules} gives the rule table.
+It escalates more as the crisis level rises and as the reply becomes less appropriate.
+
+\begin{table}[t]
+\caption{Rule table of the escalation decoder (crisis level $\times$ reply word $\to$ action). A design proposal, not
+clinically validated.}
+\label{tab:rules}
+\input{generated/tables/rule_table}
+\end{table}
+
+Inference uses max--min firing.
+The strength of the rule for crisis word $c$ and reply word $r$ is $\min\bigl(\mu_c(\mu), s_r\bigr)$, where
+$\mu_c(\mu)$ is the membership of the crisis degree in word $c$ and $s_r$ the similarity of the reply to word $r$; the
+strength of an action is the maximum over the rules that conclude it.
+The decoder outputs the strongest action, and ties go to the more severe action, so that uncertainty never lowers the
+response.
+With crisp inputs, where a single crisis word and a single reply word have membership one, the inference reduces to a
+lookup in Table~\ref{tab:rules}.

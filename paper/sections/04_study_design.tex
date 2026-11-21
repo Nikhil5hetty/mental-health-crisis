@@ -1,0 +1,186 @@
+\section{Study Design}
+\label{sec:design}
+
+The study evaluates the concept of Section~\ref{sec:concept} on published data, without new model calls.
+It has three parts: RQ1 on crisis labels, a descriptive analysis of expert uncertainty in CounselBench, and RQ2 on
+reply verdicts; a fourth part combines RQ1 and RQ2 in a demonstration of the escalation decoder.
+This section describes the data, the alignment rules, the pre-registration, the compared systems, the metrics and the
+measures taken for reproducibility.
+
+\subsection{Datasets and Licences}
+\label{sec:design-data}
+
+Table~\ref{tab:datasets} summarises the three datasets.
+All of them are used exactly as published; derived tables are produced only by scripts and are never edited by hand
+(decision D2 in Appendix~\ref{app:decisions}).
+
+\begin{table}[t]
+\caption{Datasets analysed in this paper. Units are the items that enter the analyses after the alignment rules of
+Section~\ref{sec:design-alignment}.}
+\label{tab:datasets}
+\input{generated/tables/datasets}
+\end{table}
+
+\paragraph{BHH crisis labels.}
+The BHH validation set contains \RoneNItemsAll{} user messages \citep{arnaizrodriguez2026help}.
+Each message was labelled by four human annotators and, in the published files, by three LLMs in three independent runs
+each.
+Labels use six crisis categories (suicidal ideation, self-harm, anxiety crisis, violent thoughts, substance use or
+withdrawal, and risk-taking behaviours) and a no-crisis category.
+In the published files, \RoneNLlmMissingLabelsAll{} LLM labels across \RoneNItemsWithMissingLabels{} messages are empty;
+they stay missing and are never read as ``no crisis'' (D13), so between \RoneMinLlmObserved{} and
+\RoneMaxLlmObserved{} LLM labels are observed per message.
+
+\paragraph{BHH appropriateness.}
+For the same messages, BHH publishes replies that are rated on the five-point appropriateness scale by two human
+experts and by three LLM judges (gpt-4o-mini, gpt-5-nano and a Llama model), each in three runs.
+The items were sampled towards the lowest judge scores, so unsafe replies are over-represented relative to ordinary
+use.
+After alignment, \RtwoNItemsAll{} items have scores from both experts and all three judges; one item has only two runs
+of one judge, and this is kept rather than padded.
+Of these items, \RtwoNHumanUnsafeAll{} are \emph{human-unsafe}, meaning that at least one expert rated the reply
+\word{Inappropriate} or worse.
+
+\paragraph{CounselBench-Eval.}
+CounselBench-Eval contains \CbNRepliesAll{} replies to patient questions, written by three LLMs and by online human
+therapists, each rated by five clinical experts \citep{li2026counselbench}.
+The ratings cover four Likert dimensions (overall quality, empathy, specificity and toxicity), a judgement of medical
+advice (yes, no or not sure), factual consistency, and free-text copies of sentences that an expert considered risky.
+This part is descriptive only: no LLM judge is evaluated on it (D6).
+
+\paragraph{Licences and ethics of reporting.}
+CounselBench is licensed CC BY-NC-ND 4.0, and BHH publishes its data without a licence, which we treat as permission for
+research use with citation only (D7).
+Neither raw nor derived data are redistributed, and the paper never quotes or paraphrases a message or a reply.
+All results consist of item identifiers and numbers; worked cases are described by identifiers, degrees, words and
+actions.
+
+\subsection{Use as Published and Alignment Rules}
+\label{sec:design-alignment}
+
+The guiding principle is that the published files are the data.
+Cleaning and exclusions happen only in the loaders, follow explicit rules and are logged with counts.
+Three rules were needed for BHH; Appendix~\ref{app:decisions} gives the full decision log.
+
+\paragraph{Item alignment (D11).}
+BHH stores crisis labels and appropriateness scores in separate files that share no identifier.
+An item is identified by its published position, and positional alignment is accepted only after its content has
+been verified per item and per file: the message text must match exactly after joining its turns, and the reply must
+match after a comparison-only normalisation of white space or be near-identical (similarity of at least $0.99$).
+Cells that hold spreadsheet artefacts instead of text are accepted only if the other field of the item verifies.
+No item had to be excluded under this rule.
+
+\paragraph{Per-run judge scores (D12).}
+The sampled judge files store only an aggregate score per item.
+The per-run scores are recovered from each judge's own merged result file by an exact match on message and reply,
+requiring exactly one match and an identical aggregate.
+Runs are never imputed, duplicated or padded.
+
+\paragraph{Missing labels (D13).}
+As stated above, missing LLM crisis labels are excluded from both the numerator and the denominator of the crisis
+degree, and the number of observed labels is kept per item.
+
+\subsection{Pre-Registration}
+\label{sec:design-prereg}
+
+Both analyses were pre-registered in the sense of \citet{nosek2018preregistration}: the analysis plan was written and
+committed to the project repository before any analysis code was written or run.
+The plan for RQ2 was frozen in commit \PlanRtwoCommit{} on \PlanRtwoDate{}; the plan for RQ1, the CounselBench analysis
+and the escalation demo was frozen in commit \PlanRoneDemoCommit{} on \PlanRoneDemoDate{}.
+Each plan fixes the data, the systems, the metrics, the hypotheses with their direction, the strata and the sensitivity
+analyses.
+The plans were never edited afterwards; every deviation is recorded with its reason in the generated summary of the
+respective analysis.
+
+All hypothesis tests are exploratory: there is no correction for multiplicity, and a verdict is not a confirmatory
+claim (D15).
+A pre-registered result keeps its recorded verdict, even where a later reading would suggest a different rule.
+
+\subsection{Compared Systems}
+\label{sec:design-systems}
+
+\paragraph{RQ2: reply verdicts.}
+Five systems turn the judge runs of a reply into a word on the appropriateness scale.
+\begin{itemize}
+  \item \textbf{S1 (single judge)}: the mean of one judge's runs, decoded with the 2-tuple; one system per judge.
+  \item \textbf{S2 (crisp jury)}: the mean of all runs of all judges, decoded with the 2-tuple, as in an LLM jury.
+  \item \textbf{S3 (fuzzy panel)}: the panel set of all judges (Section~\ref{sec:concept-encoder}), decoded with the
+        codebook and the Jaccard similarity.
+  \item \textbf{S4 (OWA)}: the OWA of the judges' run means with orness $0.25$, decoded with the 2-tuple.
+  \item \textbf{S5 (LWA)}: the LWA of the per-judge panel sets with self-consistency weights, decoded like S3.
+\end{itemize}
+The human reference of an item is the mean of the two expert scores, decoded with the 2-tuple, together with the
+type-1 IAA set of the two scores.
+
+\paragraph{RQ1: crisis labels.}
+For each message, the human crisis degree is $\mu_H = k_H/4$, where $k_H$ is the number of human annotators who chose a
+crisis category, and the LLM crisis degree is $\mu_L = k_L/n_L$ over the observed LLM labels.
+A message is \emph{human-split} if $0 < \mu_H < 1$, that is, if the human annotators did not agree.
+The crisp alternative is the majority label of each group.
+
+\paragraph{Escalation demo.}
+Three pipelines feed the rule base of Section~\ref{sec:concept-rules}.
+\emph{P-fuzzy} uses the crisis-word memberships of $\mu_L$ and the S3 similarities.
+\emph{P-crisp} uses the LLM majority label (crisis as \word{Clear}, no crisis as \word{None}, a tie as \word{Possible})
+and the S2 word, each with membership one.
+The \emph{oracle} applies the same rule base to the human inputs: the memberships of $\mu_H$ and the similarities of
+the experts' IAA set.
+Only P-fuzzy and P-crisp could be deployed, because they use no human data.
+Because the oracle uses the same rule table, the comparison isolates the input representation, not the quality of the
+rule table.
+
+\subsection{Metrics and Statistical Analysis}
+\label{sec:design-metrics}
+
+\paragraph{RQ2 metrics.}
+Agreement with the human word (M1) is measured as exact agreement, agreement within one level and quadratic-weighted
+Cohen's kappa \citep{cohen1968weighted}.
+Fuzzy agreement (M2) is the Jaccard similarity between the system's set and the human set; crisp systems are
+represented by the IAA set of their value.
+Safety (M3, the primary metric) is the recall and precision of flagging human-unsafe items, where a system flags an item
+if its word is \word{Harmful/Unacceptable} or \word{Inappropriate}; for S3 and S5, variant M3b adds the
+escalate-when-unsure rule of Section~\ref{sec:concept-decoder}.
+Stability (M4) is the share of items whose word changes when one judge is removed (M4a), and the share of items whose
+word changes when each judge contributes one randomly drawn run, averaged over \ResampleDraws{} draws (M4b).
+The uncertainty signal (M5) is the Spearman correlation of a system's uncertainty with the disagreement between the two
+experts and with the system's absolute error; uncertainty is the standard deviation of all runs for S2, and one minus the
+largest Jaccard similarity or the centroid width for S3 and S5.
+
+\paragraph{RQ1, CounselBench and demo metrics.}
+RQ1 reports the distributions of $\mu_H$ and $\mu_L$, the mean $\mu_L$ at each level of $\mu_H$, and a category-level
+fuzzy agreement, $\sum_c \min(p_H(c), p_L(c)) / \sum_c \max(p_H(c), p_L(c))$, where $p(c)$ is the share of raters who
+chose category $c$.
+The CounselBench analysis reports how often expert panels split on medical advice, how often their ratings span two or
+more levels, how often a decoded toxicity panel is contested, and how often exactly one expert flagged a risky
+sentence.
+The demo reports agreement of each pipeline with the oracle (exact and quadratic-weighted kappa on the action index) and
+the rates of under- and over-escalation, that is, of choosing a less or a more severe action than the oracle.
+
+\paragraph{Hypotheses.}
+The plans state six directional hypotheses.
+H1a: among human-split messages, $\mu_H$ and $\mu_L$ are positively correlated.
+H1b: crisp majority labels disagree more often on human-split messages than on unanimous ones.
+H2a: S3 and S5 flag human-unsafe replies with at least the recall of S2, and with a precision at most $0.10$ lower.
+H2b: S3 and S5 change their word less often than S2 when one judge is removed.
+H2c: the uncertainty of S3 and S5 correlates more strongly with expert disagreement than the run spread of S2.
+H3: P-fuzzy under-escalates on oracle A2 or A3 items no more often than P-crisp.
+
+\paragraph{Confidence intervals and verdicts.}
+Every estimate is reported with a 95\% percentile confidence interval from an item bootstrap with \BootB{} resamples
+and the fixed seed \BootSeed{} \citep{efron1993bootstrap}.
+Comparisons between systems use paired differences, in which both systems are evaluated on the same resampled items.
+A hypothesis is \emph{supported} if the confidence interval of its stated quantity lies entirely on the hypothesised
+side of its boundary, \emph{not supported} if it lies entirely on the other side, and \emph{inconclusive} otherwise; if two
+systems behave identically, the interval collapses onto the boundary and the verdict stays inconclusive (D15).
+All metrics are also reported for messages labelled as no crisis and as a crisis, and the pre-registered sensitivity
+analyses vary the codebook FOU width, the OWA orness and the contested threshold.
+
+\subsection{Reproducibility}
+\label{sec:design-repro}
+
+The analyses run offline and with fixed seeds, using only the loaders, the CWW library and one script per part.
+Running each script twice produced byte-identical metric files, and an automated test suite checks the library and the
+decision rules on synthetic data.
+Every number in this paper is a macro that a script exports from the result files, and a further script rejects any
+number typed by hand into the text; Appendix~\ref{app:prototype} documents the repository and how to reproduce all
+results.
