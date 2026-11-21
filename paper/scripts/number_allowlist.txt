@@ -1,0 +1,30 @@
+# Numbers allowed as literals in the paper's hand-written .tex files.
+# Every entry needs a source. Result numbers never belong here: use paper/generated/numbers.tex.
+# Format: <literal>  # <reason and source>
+
+# CWW parameters defined in docs/METHOD.md
+0.5    # Likert-bin half-width of the IAA encoder (METHOD 4); contested max-Jaccard threshold (plan RQ2)
+0.25   # default fou_width of the appropriateness codebook (METHOD 7); S4 orness (plan RQ2)
+0.01   # universe sampling step (METHOD 1)
+2.4    # EKM initial switch point N/2.4 (METHOD 2)
+1.7    # EKM initial switch point N/1.7 (METHOD 2)
+0.75   # codebook trapezoid shoulder offset k +/- 0.75 (METHOD 7)
+51     # number of alpha levels in the FWA/LWA (METHOD 5)
+
+# Frozen analysis-plan constants (docs/ANALYSIS_PLAN_RQ2.md, docs/ANALYSIS_PLAN_RQ1_DEMO.md)
+0.05   # contested margin top-1 minus top-2 Jaccard; escalate-when-unsure margin (plan RQ2)
+0.10   # precision non-inferiority margin of H2a (plan RQ2)
+0.4    # sensitivity grid of the contested threshold (plan RQ2)
+0.6    # sensitivity grid of the contested threshold (plan RQ2)
+0.99   # D11 answer similarity threshold (DECISIONS D11)
+95     # 95% confidence intervals (plans)
+
+# Public crisis-service phone numbers (names of services, not results)
+113    # 113 Zelfmoordpreventie (Netherlands)
+143    # Die Dargebotene Hand (Switzerland)
+147    # Pro Juventute helpline for young people (Switzerland)
+144    # Swiss emergency medical number
+112    # European emergency number
+
+# Licence versions (names, not results)
+4.0    # CC BY-NC-ND 4.0 (CounselBench licence)

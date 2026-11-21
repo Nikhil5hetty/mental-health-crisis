@@ -1,0 +1,63 @@
+% Seminar paper: Computing with Words for LLM-judge safety evaluation in mental-health chatbots.
+% Build: make (latexmk). Overleaf: upload paper/ as is; main document = main.tex.
+\documentclass[manuscript,screen,nonacm]{acmart}
+\citestyle{acmauthoryear}
+
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+\input{generated/numbers}
+
+% Terminology helpers (no numbers).
+\newcommand{\Perc}{Perceptual Computer}
+\newcommand{\word}[1]{\textsf{#1}}
+
+\begin{document}
+
+\title{Keeping Disagreement: Computing with Words for LLM-Judge Safety Evaluation of Mental-Health Chatbot Replies}
+\subtitle{Seminar Urban Computing, HS2026 --- Examiner: Prof.\ Dr.\ Edy Portmann; Supervisor: Janick Spycher}
+
+\author{Nikhil Shetty}
+\authornote{Matriculation number: TODO (authors).}
+\affiliation{%
+  \institution{University of Bern, BeNeFri}
+  \city{Bern}
+  \country{Switzerland}}
+
+\author{Rajeshwar Rao}
+\authornote{Matriculation number: TODO (authors).}
+\affiliation{%
+  \institution{University of Bern, BeNeFri}
+  \city{Bern}
+  \country{Switzerland}}
+
+\renewcommand{\shortauthors}{Shetty and Rao}
+
+\begin{abstract}
+\input{sections/00_abstract}
+\end{abstract}
+
+\keywords{computing with words, perceptual computer, interval type-2 fuzzy sets, LLM-as-a-judge, rater disagreement,
+mental-health chatbots, crisis escalation, cognitive cities}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_concept}
+\input{sections/04_study_design}
+\input{sections/05_results}
+\input{sections/06_discussion}
+\input{sections/07_conclusion}
+\input{sections/08_ai_declaration}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+\appendix
+\input{sections/A_prototype}
+\input{sections/B_decisions}
+\input{sections/C_tables}
+
+\end{document}
