@@ -37,3 +37,6 @@
 54     # citizen age band 35-54 (plan RQ1 groups)
 55     # citizen age band 55+ (plan RQ1 groups)
 0.95   # quantile q_0.95 of the quantile trapezoid (plan: q05, q25, q75, q95); also used with 0.05, 0.25, 0.75 above
+
+# Software environment (PM ruling on PR #32)
+3.12   # reference Python version of the project (requirements.txt, app/README.md)

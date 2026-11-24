@@ -1,5 +1,24 @@
-%% To be written in PR B.
 \section{Full Tables}
 \label{app:tables}
 
-To be written in PR B.
+\begin{table}[h]
+\caption{Citizen codebook per phrase (RQ1), ordered by FOU area: FOU area, EKM centroid, centre, and IQR and median of
+all respondents' answers.}
+\label{tab:rq1fou}
+\input{generated/tables/rq1_fou}
+\end{table}
+
+\begin{table}[h]
+\caption{Citizen vs LLM codebook per phrase (RQ2, prompt P1), ordered by Jaccard similarity: overlap of the IT2 sets,
+centre shift (LLM minus respondents), width ratio of the pooled LLM answers, and number of models in the LLM envelope.
+n/a: undefined because the respondent IQR is zero (D20).}
+\label{tab:rq2terms}
+\input{generated/tables/rq2_terms}
+\end{table}
+
+\begin{table}[h]
+\caption{Decision rates of the LLM codebook against the citizen codebook and against each group codebook (RQ3), with
+95\% bootstrap intervals.}
+\label{tab:rq3rates}
+\input{generated/tables/rq3_rates}
+\end{table}

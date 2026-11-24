@@ -1,5 +1,152 @@
-%% To be written in PR B.
 \section{Results}
 \label{sec:results}
 
-To be written in PR B.
+We first summarise the earlier study that motivated this one (Section~\ref{sec:res-motivation}) and then answer RQ1 to
+RQ3.
+All intervals are 95\% bootstrap intervals; Table~\ref{tab:hypotheses} lists every hypothesis with its recorded verdict,
+and Appendix~\ref{app:tables} gives the full per-phrase tables.
+
+\subsection{Motivation: Disagreement in Crisis Judgements}
+\label{sec:res-motivation}
+
+In an earlier pre-registered study on the same BHH messages (commit \PlanRoneDemoCommit{}), we found that crisis
+judgements are often contested.
+The four human annotators of BHH split on whether a message signals a crisis for a share of \RoneShareHumanSplitAllFull{}
+of the \RoneNItemsAll{} messages.
+When an LLM-judge panel was decoded with CWW and allowed to escalate when its verdict was contested
+(\emph{escalate when unsure}), recall of the replies that the human raters judged unsafe rose by
+\RtwoDIFFMThreeBVsMThreeRecallSThreeSTwoFull{} over the crisp mean of all judge runs, at a change in precision of
+\RtwoDIFFMThreeBVsMThreePrecisionSThreeSTwoFull{}.
+Both results point to the same question: if uncertainty is kept and put into words, whose meaning of those words does
+the system use?
+
+\subsection{RQ1: The Citizen Codebook}
+\label{sec:res-rq1}
+
+Respondents agree on the extremes and disagree in the middle.
+The FOU area, which measures how much the demographic groups differ, ranges from \WoneFouAreaAlmostNoChance{} for
+\word{\WoneNarrowestTerm} to \WoneFouAreaUnlikely{} for \word{\WoneWidestTerm} (Table~\ref{tab:rq1fou} in
+Appendix~\ref{app:tables}).
+Two phrases are almost points for respondents: the middle half of them gave the same number for \word{About Even} (IQR
+\WoneIqrAboutEven{}), and nearly so for \word{Will Happen} (IQR \WoneIqrWillHappen{}).
+The level word \word{Likely}, for example, has a centroid of $[\WoneCentroidLeftLikely, \WoneCentroidRightLikely]$ and a
+centre of \WoneCentreLikely{}.
+All \WoneNGroups{} groups had enough answers for every phrase (\WoneGroupCellsExcluded{} exclusions), and the mean Jaccard
+similarity between two groups ranged from \WoneGroupJaccardMin{} to \WoneGroupJaccardMax{}; native speakers of similar
+age agreed most.
+
+The absolute judgements are internally consistent: in \WoneConsistencyConsistentSharePct{}\% of the
+\WoneConsistencyNPairs{} pairwise choices, respondents chose the phrase to which they had given the higher number
+(\WoneConsistencyTieSharePct{}\% ties, \WoneConsistencyInconsistentSharePct{}\% inconsistent).
+The codebook is robust: excluding the \WoneInattentionExcluded{} inattentive respondents barely changes the IT2 word
+models (mean Jaccard with the primary codebook \WoneSensInattentionExcludedMeanJaccardPrimary{}).
+An envelope over bootstrap resamples of all respondents is much narrower than the envelope over groups (mean FOU area
+\WoneSensBootstrapMeanFouArea{} against \WoneMeanFouArea{}; mean Jaccard \WoneSensBootstrapMeanJaccardPrimary{}), so the
+FOU of the citizen codebook reflects differences between groups, not sampling noise.
+
+\subsection{RQ2: The LLM Codebook}
+\label{sec:res-rq2}
+
+LLM meanings overlap only partly with the citizen codebook (Figure~\ref{fig:jaccard}).
+The Jaccard similarity of the two IT2 sets is highest for \word{Chances are Slight}
+(\WtwoJaccardItTwoChancesAreSlightLlmItTwoFull{}) and lowest for \word{Better than Even}
+(\WtwoJaccardItTwoBetterThanEvenLlmItTwoFull{}) and \word{About Even} (\WtwoJaccardItTwoAboutEvenLlmItTwoFull{}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.5\linewidth]{figures/words_rq2_jaccard_dotplot.png}
+\caption{Jaccard similarity between the citizen and the LLM IT2 word model per phrase (prompt P1), with 95\% bootstrap
+intervals. Orange: hedge words of H2a; blue: extreme words of H2a; grey: other phrases.}
+\label{fig:jaccard}
+\end{figure}
+
+\paragraph{H2a is reversed.}
+We expected less overlap for hedge words than for extreme words.
+The opposite holds: the mean Jaccard is \WtwoMeanJaccardHedgeHedgeLlmItTwoFull{} for hedge words and
+\WtwoMeanJaccardExtremeExtremeLlmItTwoFull{} for extreme words, so $D = \WtwoHTwoADHedgeMinusExtremeLlmItTwoFull$ lies
+entirely above zero, and H2a is not supported.
+The persona prompt P2 gives the same direction ($D = \WtwoPtwoHTwoADHedgeMinusExtremeLlmItTwoFull$).
+
+\paragraph{The largest shifts.}
+The centres of three phrases move by more than twenty percentage points.
+\word{Will Happen} moves down by \WtwoCentroidShiftItTwoWillHappenLlmItTwoFull{} points: respondents treat it as near
+certainty, whereas the models disagree; one always answers $100$, one places it around three quarters, and one spreads
+its answers over most of the scale, and the LLM envelope contains all three.
+The negative phrases \word{Improbable} (\WtwoCentroidShiftItTwoImprobableLlmItTwoFull{}) and \word{Highly Unlikely}
+(\WtwoCentroidShiftItTwoHighlyUnlikelyLlmItTwoFull{}) move up, so that the LLMs read them as less unlikely than
+respondents do.
+Among the level words of the decision rule, \word{Likely} moves down by \WtwoCentroidShiftItTwoLikelyLlmItTwoFull{} points.
+
+\paragraph{H2b: narrower, but not for every model.}
+Three models use most phrases more narrowly than respondents: the share of phrases with a smaller IQR is
+\WtwoHTwoBShareAllGemmaTwoNineBFull{} for \WModelGemmaTwoNineB{}, \WtwoHTwoBShareAllMistralSevenBFull{} for
+\WModelMistralSevenB{} and \WtwoHTwoBShareAllQwenTwoFiveSevenBFull{} for \WModelQwenTwoFiveSevenB{}.
+For \WModelLlamaThreeOneEightB{} (\WtwoHTwoBShareAllLlamaThreeOneEightBFull{}) and for the answers of all models pooled
+(\WtwoHTwoBShareAllPooledLlmFull{}) H2b is not supported, because the models disagree with each other even where each is
+narrow.
+Under P2, \WModelLlamaThreeOneEightB{} is never narrower (\WtwoPtwoHTwoBShareAllLlamaThreeOneEightBFull{}).
+
+\paragraph{Collapsed meanings.}
+In \WtwoCollapsesPOne{} of \WtwoCellsPOne{} model--phrase cells under P1 (\WtwoCollapsesPTwo{} under P2), a model gave the
+same number in at least nine of ten answers at temperature \WTemperature{}, so its word model collapsed to a point:
+\WtwoCollapsesPOneMistralSevenB{} cells for \WModelMistralSevenB{}, \WtwoCollapsesPOneQwenTwoFiveSevenB{} for
+\WModelQwenTwoFiveSevenB{}, \WtwoCollapsesPOneGemmaTwoNineB{} for \WModelGemmaTwoNineB{} and
+\WtwoCollapsesPOneLlamaThreeOneEightB{} for \WModelLlamaThreeOneEightB{}.
+Typical collapsed answers are round numbers, such as fifty for \word{About Even} or \word{Probable}.
+\WModelMistralSevenB{} gave too few valid answers for \word{Will Happen} and was excluded for that phrase; the width ratio
+for \word{Will Happen} is extreme (\WtwoWidthRatioWillHappenPooledLlm{} for the pooled answers) because the respondent IQR
+is only \WtwoCitizenIqrWillHappenCitizen{}.
+
+\begin{table}[t]
+\caption{Hypotheses, estimates with 95\% bootstrap intervals, and the verdicts recorded by the analysis scripts.
+All tests are exploratory.}
+\label{tab:hypotheses}
+\input{generated/tables/hypotheses}
+\end{table}
+
+\subsection{RQ3: Does the Mismatch Change the Decision?}
+\label{sec:res-rq3}
+
+With the LLM codebook instead of the citizen codebook, the crisis word changes for a share of
+\WthreeWordDisagreementRateLlmVsCitizenFull{} of the \WthreeNItems{} messages, and the action changes for
+\WthreeActionFlipRateLlmVsCitizenFull{}, that is \WthreeNFlips{} messages.
+The lower bound of the interval is above zero, so H3 is supported.
+The flips lean towards under-escalation: in \WthreeNUnder{} messages the LLM codebook leads to the less urgent action
+(\WthreeUnderEscalationRateLlmVsCitizenFull{}) and in \WthreeNOver{} to the more urgent one
+(\WthreeOverEscalationRateLlmVsCitizenFull{}).
+All flips lie between A0 and A1: \WthreeMatrixLlmVsCitizenAOneAZero{} messages move from suggesting a helpline to simply
+continuing, and \WthreeMatrixLlmVsCitizenAZeroAOne{} the other way.
+No message moves to or from a human handover.
+Against the six group codebooks, the flip rate ranges up to \WthreeActionFlipRateLlmVsNativeThreeFiveFiveFourFull{}
+(native speakers aged 35--54; Table~\ref{tab:rq3rates} in Appendix~\ref{app:tables}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.66\linewidth]{figures/words_rq3_level_words.png}
+\caption{The four crisis-level words in the citizen (top) and LLM (bottom) codebook, as average membership
+$(\overline{\mu} + \underline{\mu})/2$ over the crisis degree. Ticks below zero mark the crisis degrees of the messages.
+The LLM codebook has no word between the end of \word{Remote Chance} and the start of \word{Realistic Possibility}.}
+\label{fig:levels}
+\end{figure}
+
+\paragraph{The role of the fallback.}
+The fallback for crisis degrees that no word covers decides many verbalisations (\WthreeNFallbackCitizen{} messages with
+the citizen codebook, \WthreeNFallbackLlm{} with the LLM codebook).
+Most of these are harmless: \WthreeNZeroOrHundred{} messages have $m = 0$ or $m = 100$, which lie just outside the
+quantile trapezoids of \word{Remote Chance} and \word{Almost Certain} in every codebook, and all codebooks agree on them.
+The fallback matters at intermediate degrees.
+The LLM codebook covers no level word between \WthreeLlmGapLow{} and \WthreeLlmGapHigh{} (Figure~\ref{fig:levels}), so
+the \WthreeNGapThreeThree{} messages at a crisis degree of one third fall back to \word{Remote Chance}, whereas respondents
+call that degree a \word{Realistic Possibility}.
+Of the \WthreeNFlips{} flips, \WthreeNFlipsFallback{} arise in this way and \WthreeNFlipsClean{} have both words chosen by
+maximum membership.
+Two sensitivity analyses, added after the result was known and therefore post hoc, show that the H3 conclusion does not depend on the fallback: counting only messages decided without a fallback, the flip rate is
+\WthreePosthocANoFallbackItemsOnlyActionFlipRateLlmVsCitizenFull{}, and with a fallback that picks the more severe
+neighbouring word it is \WthreePosthocBSevereNeighbourFallbackActionFlipRateLlmVsCitizenFull{}.
+
+\paragraph{Uncertain messages (post-hoc description).}
+All flips occur among the \WthreeNIntermediate{} messages whose crisis degree lies strictly between $0$ and $100$:
+\WthreeNFlipsIntermediate{} of \WthreeNIntermediate{} (\WthreeFlipShareIntermediatePct{}\%), and
+\WthreeNFlipsIntermediateClean{} of the \WthreeNIntermediateClean{} such messages decided without a fallback.
+At $m = 0$ or $m = 100$ every codebook gives the same action by construction.
+This description was added after the results were known; it reports counts only, without an interval.

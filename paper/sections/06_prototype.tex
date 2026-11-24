@@ -1,5 +1,56 @@
-%% To be written in PR B.
 \section{Prototype: The Word-Meaning Lab}
 \label{sec:prototype}
 
-To be written in PR B.
+Following design science, we built an artefact that makes the concept usable and open to evaluation
+\citep{hevner2004design}.
+The \emph{word-meaning lab} is a two-page web application, written with Streamlit, for people who decide on or audit the
+risk words of a public service: service designers, counsellors and members of the public.
+It reads only the committed aggregate results of this study (codebooks and metrics), so it needs no raw data and
+contains no licensed survey or message text.
+The installation and user manual is in Appendix~\ref{app:manual}.
+
+\begin{figure}[t]
+\centering
+\begin{minipage}[t]{\halfwidth}\centering
+\includegraphics[width=\linewidth]{figures/app_word_lab_meaning.png}
+\caption{First page of the word-meaning lab for \word{Likely}: the citizen codebook (blue) and the LLM codebook (orange)
+as outlines of their upper and lower membership functions with a lightly shaded FOU; dashed lines show each model.
+Above the chart: overlap, centre shift and the number of collapsed models.}
+\label{fig:app-meaning}
+\end{minipage}\hfill
+\begin{minipage}[t]{\halfwidth}\centering
+\includegraphics[width=\linewidth]{figures/app_word_lab_simulator.png}
+\caption{Second page, the crisis-line simulator, at a crisis degree of one third and a mostly appropriate reply: the
+citizen codebook suggests a helpline, while the LLM codebook has no word for this degree, falls back to
+\word{Remote Chance} and continues the conversation.}
+\label{fig:app-simulator}
+\end{minipage}
+\end{figure}
+
+\paragraph{First page: What does a word mean?}
+The user picks one of the phrases and sees the citizen and LLM word models on the probability scale, optionally with
+each model's set and each demographic group's set (Figure~\ref{fig:app-meaning}).
+Three headline numbers give the overlap (Jaccard), the centre shift and the number of models that gave one fixed
+number, each with a plain-language reading and its confidence interval on hover.
+A second tab ranks all phrases by overlap and marks the hedge and extreme words of H2a.
+An earlier version filled only the FOU, so that a phrase on which all groups agree looked almost empty; a review of the
+prototype led us to draw both membership functions as solid outlines, with the citizen set on top.
+This also means that the chart does not rely on colour alone.
+
+\paragraph{Second page: Crisis-line simulator.}
+The user sets a crisis degree with a slider and chooses the quality of the bot's reply (Figure~\ref{fig:app-simulator}).
+For each codebook (the citizen codebook, the LLM codebook and the six group codebooks), a table shows the chosen crisis word, how
+well it fits and the resulting action; a banner states whether the decision flips between the citizen and the LLM
+codebook and in which direction.
+A short ``how to read this'' box explains the pipeline, and a note marks crisis degrees that no word fits.
+The simulator calls the same verbalisation code as the analysis script of RQ3, not a copy of it, and a test checks that
+it reproduces the decisions of all \WthreeNItems{} study messages.
+A disclaimer on every page states that the rule table is a design proposal and not clinically validated.
+
+\paragraph{Evaluation.}
+The logic of the application is covered by unit tests on synthetic results and by automated smoke tests of both pages,
+including missing result files, for which the pages name the missing file and the script that produces it.
+A heuristic self-evaluation against Nielsen's ten usability heuristics \citep{nielsen1994enhancing} found no major
+problem; the main open points are the technical terms \emph{membership} and \emph{fit}, the missing link from the
+ranking to the single-phrase view, and the lack of shareable links to a chosen setting.
+A study with users from crisis services has not yet been done.

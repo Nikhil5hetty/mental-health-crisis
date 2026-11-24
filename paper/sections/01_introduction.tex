@@ -2,12 +2,13 @@
 \label{sec:intro}
 
 In October 2026, the Swiss helpline Die Dargebotene Hand (telephone 143) announced an AI chatbot for its online chat,
-because only a fraction of chat requests could be answered by its volunteers \citep{srf2026dargebotene}.
-The service states one firm limit: in acute suicidality the bot stops and says that a human is now needed, and it gives
-telephone numbers where help is available.
-Any such bot therefore has to make a judgement of urgency, and it has to communicate that judgement to people: to the
+because only a fraction of chat requests could be answered by its volunteers \citep{srf2026dargebotene,keystone2026dargebotene}.
+In crisis situations such as suicidal remarks, the bot follows a predefined procedure that includes an assessment of the
+urgency of the situation and information about emergency services; in acute suicidality it stops and says that a human
+is now needed \citep{keystone2026dargebotene,srf2026dargebotene}.
+Such a bot therefore makes a judgement of urgency, and that judgement has to be communicated to people: to the
 help-seeker, to the counsellor who takes over, and to the service that audits the conversation.
-The source does not describe how the bot makes this judgement.
+The sources do not describe how the bot makes this judgement.
 In this paper we study one design in which urgency is expressed in \emph{words}, such as ``a crisis is
 \word{likely}'', and ask whether those words mean the same thing to the machine and to the people it serves.
 
@@ -26,7 +27,7 @@ If machine and human meanings differ, the same estimate can lead to a different 
 In Mendel's \emph{\Perc{}} (Per-C), words are encoded as interval type-2 fuzzy sets (IT2 FSs) whose footprint of
 uncertainty records how much people disagree about a word, and these word models are collected in a \emph{codebook}
 \citep{mendel2001perceptual,mendel2010perceptual}.
-We use this architecture to compare a citizen codebook, built from a large public survey of probability words, with an
+We use this architecture to compare a \emph{citizen codebook}, built from a large public survey of probability words, with an
 LLM codebook, built by asking four local open-weight LLMs the same question many times.
 We then insert both codebooks into the same crisis-line decision rule and count how often the choice of codebook changes
 the action.
@@ -35,17 +36,18 @@ We ask three research questions, which follow a frozen analysis plan (Section~\r
 \begin{description}
 \item[RQ1] What do probability words mean to survey respondents, and how much do demographic groups disagree?
 \item[RQ2] Do LLMs mean the same thing by these words as the respondents, and are LLM meanings narrower?
-\item[RQ3] Does the mismatch between citizen and LLM meanings change the escalation decision of a crisis-line \Perc{}?
+\item[RQ3] Does the mismatch between the citizen and the LLM codebook change the escalation decision of a crisis-line
+\Perc{}?
 \end{description}
 
 The paper makes four contributions.
 First, it proposes a \Perc{} for citizen-aligned risk words, with an encoder that builds IT2 word models from point
 estimates via demographic group envelopes, an adaptation of the interval-based encoders of the CWW literature
 (Section~\ref{sec:concept}).
-Second, it reports a pre-registered comparison of citizen and LLM codebooks for \WoneNTerms{} probability words,
+Second, it reports a pre-registered comparison of the citizen and LLM codebooks for \WoneNTerms{} probability words,
 including where LLM meanings collapse to a single number (Section~\ref{sec:results}).
-Third, it quantifies how often the codebook choice flips the action of a crisis-line decision rule on real crisis-line
-messages (Section~\ref{sec:results}).
+Third, it quantifies how often the codebook choice flips the action of a crisis-line decision rule on real help-seeking
+messages from public mental-health datasets (Section~\ref{sec:results}).
 Fourth, it provides an open prototype, the word-meaning lab, that lets non-experts explore both codebooks and the
 resulting decisions (Section~\ref{sec:prototype}).
 

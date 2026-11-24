@@ -1,5 +1,53 @@
-%% To be written in PR B.
 \section{Installation and User Manual of the Word-Meaning Lab}
 \label{app:manual}
 
-To be written in PR B.
+\paragraph{Installation.}
+The reference environment is Python 3.12 with the package versions pinned in \texttt{requirements.txt} of the project
+repository, including Streamlit.
+From the repository root:
+\begin{quote}\small\ttfamily
+python3.12 -m venv .venv\\
+.venv/bin/python -m pip install -r requirements.txt\\
+.venv/bin/streamlit run app/word\_lab.py
+\end{quote}
+Streamlit prints a local address and opens it in the browser.
+The application needs only the committed folder \texttt{results/\allowbreak words/}; if a required file is missing,
+the page names it together with the script that produces it.
+The logic tests and the smoke tests of both pages run with
+\begin{quote}\small\ttfamily
+.venv/bin/python -I -m pytest -q tests/test\_word\_lab.py
+\end{quote}
+Newer Python versions may need the workaround documented in \texttt{app/README.md}.
+
+\paragraph{First page: What does a word mean?}
+\begin{enumerate}
+\item Choose a phrase in the drop-down list.
+\item Read the chart: the horizontal axis is the probability in percent, the height is the membership, that is, how well
+each number fits the phrase. Blue outlines show the citizen codebook: the outer line is the widest demographic group,
+the inner line is where all groups agree, and the shading between them shows disagreement. Orange outlines show the
+LLM codebook in the same way. Dashed lines show each model; a tall thin spike means a model always gave the same number.
+\item Use the switches to show or hide the model lines and the six group lines.
+\item Read the headline numbers: overlap (Jaccard, from zero to one), centre shift (LLM minus respondents, in
+percentage points) and the number of models that gave one fixed number; hover over the help icon for the confidence
+interval. A note appears when a model was excluded for the phrase.
+\item The tab ``All words ranked'' orders all phrases by overlap, with intervals, and marks hedge and extreme words.
+\end{enumerate}
+
+\paragraph{Second page: Crisis-line simulator.}
+\begin{enumerate}
+\item Set the crisis degree, from zero to one hundred: in the study, the share of LLM labellers that marked a message
+as a crisis.
+\item Choose the quality of the bot's reply, from \word{Harmful/Unacceptable} to \word{Fully Appropriate}.
+\item Read the banner: red ``Decision flips'' if the citizen and the LLM codebook lead to different actions, with the
+direction; green ``Same decision'' otherwise.
+\item The table gives, for each codebook, the crisis word, its fit and the action (A0 continue, A1 suggest a helpline,
+A2 hand over to a counsellor, A3 urgent handover with emergency numbers); highlighted rows differ from the citizen
+codebook, and ``no fit'' marks degrees that no word covers.
+\item The expander ``Where does each crisis word start and stop?'' shows the four crisis words of both codebooks with the
+slider position.
+\end{enumerate}
+
+\paragraph{Known limitations.}
+The application is a research prototype and not a clinical tool; it shows only prompt P1, only the four models of the
+study and only the six demographic groups; it shows the study's confidence intervals but does not recompute them; and
+it has not been tested with a screen reader or with users from crisis services.

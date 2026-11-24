@@ -170,6 +170,26 @@ def rq3_rates() -> None:
                                      small=False))
 
 
+def decisions() -> None:
+    """Appendix decision log, generated from docs/DECISIONS.md (table rows verbatim; D11/D12 by heading)."""
+    text = (ROOT / 'docs/DECISIONS.md').read_text(encoding='utf-8')
+    items = {}
+    for num, title in re.findall(r'^## D(\d+) \S (.+)$', text, flags=re.M):
+        items[int(num)] = f'{title}. Full rule in \\texttt{{docs/DECISIONS.md}}.'
+    for num, body in re.findall(r'^\| D(\d+) \| (.+) \|$', text, flags=re.M):
+        items[int(num)] = body
+    def tex(s):
+        s = tex_escape(s).replace('×', r'$\times$').replace('→', r'$\rightarrow$').replace('≥', r'$\geq$')
+        s = s.replace('~', r'\textasciitilde{}').replace('^', r'\textasciicircum{}')
+        return re.sub(r'`([^`]+)`', lambda m: r'\texttt{' + m.group(1) + '}', s)
+    lines = [r'\begin{description}\footnotesize']
+    for num in sorted(items):
+        body = items[num] if items[num].endswith('}.') else tex(items[num])
+        lines.append(rf'\item[D{num}] {body}')
+    lines += [r'\end{description}', '']
+    write('decisions', '\n'.join(lines))
+
+
 def copy_figures() -> None:
     FIG.mkdir(parents=True, exist_ok=True)
     for part in ['rq1', 'rq2', 'rq3']:
@@ -181,7 +201,7 @@ def copy_figures() -> None:
 
 def main() -> None:
     TAB.mkdir(parents=True, exist_ok=True)
-    for fn in [profile, elicitation, levels_and_rules, rq1_fou, rq2_terms, hypotheses, rq3_rates]:
+    for fn in [profile, elicitation, levels_and_rules, rq1_fou, rq2_terms, hypotheses, rq3_rates, decisions]:
         fn()
     copy_figures()
     print(f'Wrote {len(list(TAB.glob("*.tex")))} tables to paper/generated/tables and copied figures to paper/figures')

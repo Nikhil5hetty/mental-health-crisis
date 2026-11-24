@@ -1,5 +1,20 @@
-%% To be written in PR B.
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-To be written in PR B.
+We asked whether survey respondents and LLMs mean the same thing by probability words, and whether it matters for a
+crisis-line bot that puts urgency into words.
+A citizen codebook built with an adaptation of CWW word encoding shows that respondents agree on extreme phrases and
+disagree, mostly between demographic groups, on phrases in the middle (RQ1).
+Four local LLMs agree with respondents only partly: they use most phrases more narrowly, often collapse a phrase to one
+number, and diverge most for extreme and negative phrases, which reverses our hypothesis about hedge words (RQ2).
+In a crisis-line \Perc{}, replacing the citizen codebook with the LLM codebook changes the action for
+\WthreeNFlips{} of \WthreeNItems{} help-seeking messages, mostly towards suggesting a helpline less often (RQ3).
+The effect is small but systematic, and part of it comes from a gap in the LLM codebook where no level word applies.
+We conclude that the meaning of risk words is a design property of an AI-supported public service, and that it should be
+defined with the people the service serves and checked against the system, which the word-meaning lab makes concrete.
+
+Future work should collect interval data from people in the service's region and languages, so that the IA or EIA can
+encode individual uncertainty, and should include counsellors of crisis lines.
+It should test larger and commercial models, and whether giving a model the citizen codebook in its prompt aligns its
+meanings.
+The rule table needs validation with crisis professionals, and the word-meaning lab a study with its intended users.

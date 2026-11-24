@@ -970,6 +970,7 @@ macro,value,source
 \WoneGroupCellsExcluded,0,results/words/rq1/metrics.csv:included==0
 \WoneNotInGroups,467,results/words/rq1/metrics.csv:n_group_excluded
 \WoneWidestTerm,Unlikely,results/words/rq1/metrics.csv:max fou_area
+\WoneMeanFouArea,8.81,results/words/rq1/metrics.csv:mean fou_area
 \WoneNarrowestTerm,Almost No Chance,results/words/rq1/metrics.csv:min fou_area
 \WoneProfileCountryUnitedKingdomN,"2{,}018",results/words/rq1/respondent_profile.csv:country|United Kingdom
 \WoneProfileCountryUnitedKingdom,0.390,results/words/rq1/respondent_profile.csv:country|United Kingdom
@@ -4178,8 +4179,17 @@ macro,value,source
 \WthreeNFallbackNonNativeOneEightThreeFour,154,results/words/rq3/per_item.csv:sum fallback_non_native_18-34
 \WthreeNFallbackNonNativeThreeFiveFiveFour,154,results/words/rq3/per_item.csv:sum fallback_non_native_35-54
 \WthreeNFallbackNonNativeFiveFive,154,results/words/rq3/per_item.csv:sum fallback_non_native_55+
+\WthreeNIntermediate,36,results/words/rq3/per_item.csv:0 < m < 100
+\WthreeNFlipsIntermediate,9,results/words/rq3/per_item.csv:flips with 0 < m < 100
+\WthreeFlipShareIntermediate,0.250,results/words/rq3/per_item.csv:flips / items with 0 < m < 100
+\WthreeFlipShareIntermediatePct,25.0,results/words/rq3/per_item.csv:flips / items with 0 < m < 100
+\WthreeNIntermediateClean,19,results/words/rq3/per_item.csv:0 < m < 100 without fallback
+\WthreeNFlipsIntermediateClean,5,"results/words/rq3/per_item.csv:flips, 0 < m < 100, no fallback"
 \WthreeMinObserved,6,results/words/rq3/per_item.csv:min n_llm_observed
 \WthreeMaxObserved,9,results/words/rq3/per_item.csv:max n_llm_observed
+\WthreeLlmGapLow,20,results/words/rq2/codebooks/llm_it2.csv:P1 Remote Chance max x with umf>0
+\WthreeLlmGapHigh,41.5,results/words/rq2/codebooks/llm_it2.csv:P1 Realistic Possibility min x with umf>0
+\WthreeNGapThreeThree,9,results/words/rq3/per_item.csv:items with m = 100/3
 \WthreeNZeroOrHundred,154,"results/words/rq3/per_item.csv:m in {0, 100}"
 \WSeed,20261124,experiments/words/run_rq2.py:SEED
 \WoneBootB,200,experiments/words/run_rq1.py:B
