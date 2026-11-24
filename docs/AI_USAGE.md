@@ -16,3 +16,4 @@ of `test_answer.py` inside a downloaded reference clone and failed while importi
 its unavailable `openai` dependency. Added `pytest.ini` to restrict discovery to
 trusted `tests/` and `scripts/`, excluding `data/`. No source dependency was
 installed to satisfy that test. Raw checksums remained unchanged.
+| 2026-11-24 | Codex | WP1 CAPphrase data | Added pinned CAPphrase fetching, offline read-only loaders, explicit demographic grouping, verification summaries, and synthetic tests on feature/capphrase-data. Copied only three published CSVs unchanged; no analysis outputs or outlier removal. Confirmed repeat-fetch idempotence and raw checksums; full verification output is included in the PR. |

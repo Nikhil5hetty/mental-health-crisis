@@ -299,8 +299,18 @@ def fetch_mentalhealthbench(f):
     f.extract_zip(archive, target, name, name)
 
 
+def fetch_capphrase(f):
+    name = "capphrase"
+    repo, paths = f.git_source(name, "https://github.com/adamkucharski/CAPphrase", "CC-BY-4.0")
+    selected = [repo / "data" / filename for filename in (
+        "absolute_judgements.csv", "pairwise_comparisons.csv", "respondent_metadata.csv")]
+    if not all(path in paths for path in selected):
+        raise ValueError("CAPphrase is missing a required published CSV")
+    f.copy_git(name, selected, repo / "data", ROOT / "data/raw" / name, name)
+
+
 FETCHERS = {"between_help_and_harm": fetch_between_help_and_harm, "counselbench": fetch_counselbench,
-            "mentalalign": fetch_mentalalign, "mentalhealthbench": fetch_mentalhealthbench}
+            "mentalalign": fetch_mentalalign, "mentalhealthbench": fetch_mentalhealthbench, "capphrase": fetch_capphrase}
 
 
 def main():

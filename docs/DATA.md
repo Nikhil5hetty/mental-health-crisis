@@ -209,3 +209,56 @@ examples; the release requests this to limit benchmark contamination.
 - MentalAlign's 34 out-of-range Safety scores and 59 missing/null scores remain
   unchanged. Later analysis must state its policy for those values explicitly.
 - No requested dataset is missing. Verily and SIM-VAIL were intentionally not fetched.
+
+## E. CAPphrase (WP1, data only)
+
+**Citation:** Kucharski AJ (2026). *CAPphrase: Comparative and Absolute Probability
+phrase dataset*. [DOI: 10.5281/zenodo.18750055](https://doi.org/10.5281/zenodo.18750055).
+[Official repository](https://github.com/adamkucharski/CAPphrase).
+**Licence:** CC-BY 4.0, as declared in the source README. Attribution is required.
+
+Fetch with `.venv/bin/python -I scripts/fetch_data.py --only capphrase`. The full
+reference clone lives in ignored `data/external_repos/capphrase/`. Only these
+three published files are copied byte-for-byte into `data/raw/capphrase/`:
+
+- `absolute_judgements.csv`: response_id, term, probability, order.
+- `pairwise_comparisons.csv`: response_id, pair_id, term1, term2, selected.
+- `respondent_metadata.csv`: response_id, timestamp, age_band,
+  english_background, education_level, country_of_residence.
+
+`data/MANIFEST.json` pins the Git commit and records each file's download time,
+source URL, size, SHA-256, and licence. Other source data files, including
+benchmark yardsticks, are outside this task. No downloaded R code is executed.
+These are the publisher's preprocessed release files; this project applies no
+additional outlier filtering, sample exclusions, or analysis in WP1.
+
+`src/data/capphrase.py` exposes `load_judgements()`, `load_pairs()`, and
+`load_respondents()`, with an optional root path for synthetic fixtures. Each
+returns a DataFrame preserving published rows/order and original fields, plus
+`english_group` and `age_group`. Groups are attached to judgements and pairs via
+a validated many-to-one respondent join; duplicate metadata or missing coverage
+raises rather than dropping rows. Demographic source strings, including literal
+`NA`, stay intact. The mapping is also documented in the module docstring:
+
+| Source value | Derived group |
+|---|---|
+| English is my first language | native |
+| English is not my first language but I am fluent | non_native |
+| English is not my first language and I am not fluent | non_native |
+| 18-24, 25-34 | 18-34 |
+| 35-44, 45-54 | 35-54 |
+| 55-64, 65-74, 75+ | 55+ |
+| Under 18 | under_18 |
+| Literal NA, empty/whitespace-only, or null | missing |
+
+Whitespace is stripped only when comparing group labels. Unknown nonmissing
+categories raise; they are never silently assigned to `missing`. Under-18 and
+missing-demographic respondents remain included.
+
+`.venv/bin/python -I scripts/verify_data.py` checks the requested row counts,
+respondent coverage of all 19 terms, probability bounds, presentation ordering,
+and pair consistency. Its group counts count **respondents**, not repeated
+judgement rows. The requested term medians are an unfiltered verification
+summary printed to stdout; WP1 creates no experiment or analysis artifacts.
+Synthetic tests cover mappings, preservation, join failures, numeric parsing,
+and out-of-range verification. No real respondent rows are embedded in tests.
