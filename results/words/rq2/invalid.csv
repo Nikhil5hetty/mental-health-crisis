@@ -1,0 +1,153 @@
+model,prompt_id,term,n_rows,n_valid,n_missing,invalid_rate,n_reasked,n_length,n_superseded,included
+gemma2:9b,P1,About Even,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Almost Certain,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Almost No Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Better than Even,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Chances are Slight,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Could Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Highly Likely,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Highly Unlikely,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Improbable,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Likely,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Little Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P1,May Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Might Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Probable,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Realistic Possibility,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Remote Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Unlikely,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Very Good Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P1,Will Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P2,About Even,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Almost Certain,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Almost No Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Better than Even,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Chances are Slight,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Could Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Highly Likely,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Highly Unlikely,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Improbable,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Likely,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Little Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P2,May Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Might Happen,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Probable,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Realistic Possibility,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Remote Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Unlikely,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Very Good Chance,50,50,0,0,0,0,0,1
+gemma2:9b,P2,Will Happen,50,50,0,0,0,0,0,1
+llama3.1:8b,P1,About Even,50,50,0,0,4,0,3,1
+llama3.1:8b,P1,Almost Certain,50,50,0,0,1,0,1,1
+llama3.1:8b,P1,Almost No Chance,50,50,0,0,2,0,3,1
+llama3.1:8b,P1,Better than Even,50,50,0,0,50,0,50,1
+llama3.1:8b,P1,Chances are Slight,50,50,0,0,2,0,1,1
+llama3.1:8b,P1,Could Happen,50,50,0,0,4,0,2,1
+llama3.1:8b,P1,Highly Likely,50,50,0,0,0,0,0,1
+llama3.1:8b,P1,Highly Unlikely,50,50,0,0,0,0,0,1
+llama3.1:8b,P1,Improbable,50,50,0,0,2,0,0,1
+llama3.1:8b,P1,Likely,50,50,0,0,0,0,0,1
+llama3.1:8b,P1,Little Chance,50,50,0,0,1,0,1,1
+llama3.1:8b,P1,May Happen,50,50,0,0,2,0,0,1
+llama3.1:8b,P1,Might Happen,50,50,0,0,1,0,0,1
+llama3.1:8b,P1,Probable,50,50,0,0,1,0,1,1
+llama3.1:8b,P1,Realistic Possibility,50,50,0,0,13,0,2,1
+llama3.1:8b,P1,Remote Chance,50,50,0,0,8,0,6,1
+llama3.1:8b,P1,Unlikely,50,50,0,0,0,0,0,1
+llama3.1:8b,P1,Very Good Chance,50,50,0,0,1,0,2,1
+llama3.1:8b,P1,Will Happen,50,50,0,0,2,0,3,1
+llama3.1:8b,P2,About Even,50,50,0,0,2,0,2,1
+llama3.1:8b,P2,Almost Certain,50,50,0,0,5,0,5,1
+llama3.1:8b,P2,Almost No Chance,50,50,0,0,7,0,7,1
+llama3.1:8b,P2,Better than Even,50,50,0,0,8,0,8,1
+llama3.1:8b,P2,Chances are Slight,50,50,0,0,17,0,17,1
+llama3.1:8b,P2,Could Happen,50,50,0,0,8,0,7,1
+llama3.1:8b,P2,Highly Likely,50,50,0,0,2,0,2,1
+llama3.1:8b,P2,Highly Unlikely,50,50,0,0,7,0,7,1
+llama3.1:8b,P2,Improbable,50,50,0,0,10,0,10,1
+llama3.1:8b,P2,Likely,50,50,0,0,3,0,3,1
+llama3.1:8b,P2,Little Chance,50,50,0,0,0,0,0,1
+llama3.1:8b,P2,May Happen,50,50,0,0,5,0,4,1
+llama3.1:8b,P2,Might Happen,50,50,0,0,8,0,5,1
+llama3.1:8b,P2,Probable,50,50,0,0,11,0,8,1
+llama3.1:8b,P2,Realistic Possibility,50,50,0,0,33,0,14,1
+llama3.1:8b,P2,Remote Chance,50,50,0,0,4,0,2,1
+llama3.1:8b,P2,Unlikely,50,50,0,0,3,0,4,1
+llama3.1:8b,P2,Very Good Chance,50,50,0,0,1,0,2,1
+llama3.1:8b,P2,Will Happen,50,50,0,0,4,0,4,1
+mistral:7b,P1,About Even,50,45,5,0.10000000000000001,7,0,0,1
+mistral:7b,P1,Almost Certain,50,50,0,0,0,0,0,1
+mistral:7b,P1,Almost No Chance,50,50,0,0,0,0,0,1
+mistral:7b,P1,Better than Even,50,50,0,0,0,0,0,1
+mistral:7b,P1,Chances are Slight,50,47,3,0.059999999999999998,24,0,0,1
+mistral:7b,P1,Could Happen,50,43,7,0.14000000000000001,7,0,0,1
+mistral:7b,P1,Highly Likely,50,49,1,0.02,9,0,0,1
+mistral:7b,P1,Highly Unlikely,50,45,5,0.10000000000000001,7,0,0,1
+mistral:7b,P1,Improbable,50,50,0,0,0,0,0,1
+mistral:7b,P1,Likely,50,46,4,0.080000000000000002,8,0,0,1
+mistral:7b,P1,Little Chance,50,50,0,0,0,0,0,1
+mistral:7b,P1,May Happen,50,34,16,0.32000000000000001,16,1,0,1
+mistral:7b,P1,Might Happen,50,50,0,0,0,0,0,1
+mistral:7b,P1,Probable,50,50,0,0,0,0,0,1
+mistral:7b,P1,Realistic Possibility,50,50,0,0,0,0,0,1
+mistral:7b,P1,Remote Chance,50,50,0,0,0,0,0,1
+mistral:7b,P1,Unlikely,50,50,0,0,0,0,0,1
+mistral:7b,P1,Very Good Chance,50,50,0,0,0,0,0,1
+mistral:7b,P1,Will Happen,50,15,35,0.69999999999999996,35,4,0,0
+mistral:7b,P2,About Even,50,45,5,0.10000000000000001,5,2,0,1
+mistral:7b,P2,Almost Certain,50,50,0,0,0,0,0,1
+mistral:7b,P2,Almost No Chance,50,50,0,0,0,0,0,1
+mistral:7b,P2,Better than Even,50,50,0,0,0,0,0,1
+mistral:7b,P2,Chances are Slight,50,50,0,0,0,0,0,1
+mistral:7b,P2,Could Happen,50,50,0,0,0,0,0,1
+mistral:7b,P2,Highly Likely,50,48,2,0.040000000000000001,4,0,0,1
+mistral:7b,P2,Highly Unlikely,50,50,0,0,0,0,0,1
+mistral:7b,P2,Improbable,50,48,2,0.040000000000000001,2,0,0,1
+mistral:7b,P2,Likely,50,40,10,0.20000000000000001,10,1,0,1
+mistral:7b,P2,Little Chance,50,50,0,0,0,0,0,1
+mistral:7b,P2,May Happen,50,37,13,0.26000000000000001,14,4,0,1
+mistral:7b,P2,Might Happen,50,45,5,0.10000000000000001,5,1,0,1
+mistral:7b,P2,Probable,50,42,8,0.16,13,0,0,1
+mistral:7b,P2,Realistic Possibility,50,44,6,0.12,6,0,0,1
+mistral:7b,P2,Remote Chance,50,50,0,0,0,0,0,1
+mistral:7b,P2,Unlikely,50,50,0,0,0,0,0,1
+mistral:7b,P2,Very Good Chance,50,50,0,0,0,0,0,1
+mistral:7b,P2,Will Happen,50,6,44,0.88,45,22,0,0
+qwen2.5:7b,P1,About Even,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Almost Certain,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Almost No Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Better than Even,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Chances are Slight,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Could Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Highly Likely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Highly Unlikely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Improbable,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Likely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Little Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,May Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Might Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Probable,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Realistic Possibility,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Remote Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Unlikely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Very Good Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P1,Will Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,About Even,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Almost Certain,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Almost No Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Better than Even,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Chances are Slight,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Could Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Highly Likely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Highly Unlikely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Improbable,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Likely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Little Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,May Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Might Happen,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Probable,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Realistic Possibility,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Remote Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Unlikely,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Very Good Chance,50,50,0,0,0,0,0,1
+qwen2.5:7b,P2,Will Happen,50,50,0,0,3,0,0,1
