@@ -1,0 +1,140 @@
+\section{Concept: A \Perc{} for Citizen-Aligned Risk Words}
+\label{sec:concept}
+
+We propose a \Perc{} in which a crisis-line bot expresses its estimate of urgency with a risk word and maps that word,
+together with an assessment of its own reply, to a service action (Figure~\ref{fig:pipeline}).
+The point of the design is that the risk words are not defined by the system builder but encoded from data about how
+people use them, and that the codebook can be exchanged.
+The same pipeline runs once with a citizen codebook and once with an LLM codebook; any difference in the action is then
+caused by the meaning of the words alone.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=4mm and 5mm, >=Stealth, font=\footnotesize,
+  every node/.append style={execute at begin node={\hyphenpenalty=10000\relax}},
+  box/.style={draw, rounded corners, align=center, minimum height=10mm, text width=24mm},
+  data/.style={draw, align=center, minimum height=8mm, text width=24mm, fill=black!4}]
+  \node[data] (survey) {Survey: one number per respondent and word};
+  \node[data, below=of survey] (llm) {LLMs: repeated answers per model and word};
+  \node[box, right=of survey] (encC) {Encoder: group T1 sets, envelope};
+  \node[box, right=of llm] (encL) {Encoder: model T1 sets, envelope};
+  \node[box, right=of encC, yshift=-7mm, text width=22mm] (book) {Codebook of risk words (IT2 FSs)};
+  \node[data, above=of book, text width=22mm] (m) {Crisis degree $m$};
+  \node[box, right=of book, text width=22mm] (verb) {Verbaliser: $m \mapsto$ crisis word};
+  \node[data, above=of verb, text width=22mm] (reply) {Reply word};
+  \node[box, right=of verb, text width=20mm] (rules) {Rule table: action A0--A3};
+  \draw[->] (survey) -- (encC);
+  \draw[->] (llm) -- (encL);
+  \draw[->] (encC) -- (book);
+  \draw[->] (encL) -- (book);
+  \draw[->] (book) -- (verb);
+  \draw[->] (m) -- (verb);
+  \draw[->] (verb) -- (rules);
+  \draw[->] (reply) -| (rules);
+\end{tikzpicture}
+\caption{The crisis-line \Perc{}. Encoder: point data are turned into interval type-2 word models (one codebook from
+citizens, one from LLMs). Engine and decoder: the crisis degree is put into a risk word with the codebook, and the risk
+word and the reply word select a service action.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Encoder: IT2 Word Models from Point Data}
+\label{sec:concept-encoder}
+
+All word models live on the probability scale $X = \{0, 0.5, 1, \dots, 100\}$.
+For a sample of numbers $v_1, \dots, v_n$ that people (or a model) give for a word, we summarise the sample by its
+quantiles $q_{0.05}, q_{0.25}, q_{0.75}, q_{0.95}$ and define a T1 \emph{quantile trapezoid}
+\begin{equation}
+\mu(x) = \begin{cases}
+\dfrac{x - q_{0.05}}{q_{0.25} - q_{0.05}} & q_{0.05} \le x < q_{0.25},\\[4pt]
+1 & q_{0.25} \le x \le q_{0.75},\\[2pt]
+\dfrac{q_{0.95} - x}{q_{0.95} - q_{0.75}} & q_{0.75} < x \le q_{0.95},\\[4pt]
+0 & \text{otherwise.}
+\end{cases}
+\label{eq:trapezoid}
+\end{equation}
+The core of the set holds the middle half of the answers and its support holds all but the most extreme tenth, which
+makes the model robust against single outlying answers.
+When $q_{0.05} = q_{0.95}$, the trapezoid collapses to a single point; we call such a set \emph{collapsed}.
+
+For a family of T1 sets $\mu_1, \dots, \mu_K$ of the same word, the IT2 word model is their envelope,
+\begin{equation}
+\overline{\mu}(x) = \max_{k} \mu_k(x), \qquad \underline{\mu}(x) = \min_{k} \mu_k(x),
+\label{eq:envelope}
+\end{equation}
+with UMF $\overline{\mu}$ and LMF $\underline{\mu}$.
+For citizens, the family consists of one trapezoid per demographic group (Section~\ref{sec:design}); for LLMs, of one
+trapezoid per model.
+A group or model enters the envelope for a word only if it gave at least \WMinN{} valid numbers for that word.
+
+This encoder is an \emph{adaptation}, not the Interval Approach.
+The IA and EIA collect an interval from each person and turn each interval into an embedded T1 set
+\citep{liu2008ia,wu2012eia}, and the IAA counts how many intervals contain a value \citep{wagner2015iaa}.
+Our data contain one number per person and word, so we first pool the numbers of a group into one T1 set and then take
+the envelope over groups.
+The minimum of \WMinN{} numbers per set follows the EIA's finding that about thirty intervals give a stable word model
+\citep{wu2012eia}, and trimming the outer tenth plays a role similar to the IA's outlier tests.
+
+The adaptation changes what the FOU means, and we keep the two kinds of uncertainty apart.
+In Mendel's view, the FOU of a word models uncertainty about the word's \emph{meaning}: within one person, who cannot
+pin a word to a single function, and across people \citep{mendel2007computing}.
+In our citizen codebook, the spread \emph{within} a group is captured by the shape of the group's T1 set, and the FOU
+captures only the disagreement \emph{between} demographic groups.
+In the LLM codebook, the T1 shape captures the variation of one model across repeated samples, and the FOU captures the
+disagreement between models.
+Both FOUs are therefore proxies for uncertainty about meaning, built from disagreement between groups or models, not
+direct measurements of it.
+
+\subsection{Engine and Decoder: From Crisis Degree to Action}
+\label{sec:concept-decoder}
+
+The engine receives a \emph{crisis degree} $m \in [0, 100]$, an estimate of how strongly a message signals a crisis.
+In the study, $m$ is the share of independent LLM labellers that marked a message as a crisis
+(Section~\ref{sec:design}).
+Four risk words from the codebook name four crisis levels, ordered by severity
+(Table~\ref{tab:rules}): \word{Remote Chance} for no crisis, \word{Realistic Possibility} for a possible crisis,
+\word{Likely} for a likely crisis and \word{Almost Certain} for a clear crisis.
+Which survey words stand for which level is a design choice of the service.
+
+The \emph{verbaliser} chooses the level word $w^\ast$ whose average membership at $m$ is largest,
+\begin{equation}
+w^\ast = \arg\max_{w} \tfrac{1}{2}\bigl(\overline{\mu}_w(m) + \underline{\mu}_w(m)\bigr),
+\label{eq:verbalise}
+\end{equation}
+with memberships linearly interpolated between grid points and ties broken towards the more severe word.
+If all four memberships are zero, no word covers $m$; the verbaliser then chooses the word whose centre, the midpoint
+of its Karnik--Mendel centroid \citep{karnik2001centroid,wu2009ekm}, is nearest to $m$, again with ties to the more
+severe word, and flags the case as a \emph{fallback}.
+
+The \emph{decoder} is a rule table that maps the crisis word and a \emph{reply word} to one of four actions
+(Table~\ref{tab:rules}): A0 continue the conversation, A1 suggest a helpline (143; 147 for young people), A2 hand over
+to a human counsellor, and A3 urgent handover with the emergency numbers 144 and 112.
+The reply word rates the bot's own reply on a five-point scale from \word{Harmful/Unacceptable} to
+\word{Fully Appropriate}; a harmful reply escalates even when a crisis is unlikely.
+The table is evaluated with max--min inference \citep{mendel2010perceptual}; because both inputs are single words with
+membership one, inference reduces to looking up one cell.
+The rule table is a design proposal and is not clinically validated.
+
+\begin{table}[t]
+\caption{Crisis levels, the CAPphrase word that names each level, and the action for each reply word
+(A0 continue, A1 suggest a helpline, A2 human counsellor, A3 urgent handover with emergency numbers).}
+\label{tab:rules}
+\input{generated/tables/rule_table}
+\end{table}
+
+\subsection{Comparing Codebooks}
+\label{sec:concept-compare}
+
+Two codebooks $A$ and $B$ are compared word by word with four measures.
+The \emph{Jaccard similarity} of two IT2 FSs \citep{wu2009comparative},
+\begin{equation}
+J(A, B) = \frac{\sum_{x} \min(\overline{\mu}_A, \overline{\mu}_B) + \min(\underline{\mu}_A, \underline{\mu}_B)}
+{\sum_{x} \max(\overline{\mu}_A, \overline{\mu}_B) + \max(\underline{\mu}_A, \underline{\mu}_B)},
+\label{eq:jaccard}
+\end{equation}
+measures overlap; for T1 sets it reduces to the usual fuzzy Jaccard index.
+The \emph{centre shift} is the difference between the centres of the two sets, in percentage points.
+The \emph{width ratio} compares the interquartile ranges (IQR) of the underlying numbers, LLM over citizens, so that a
+ratio below one means that the LLMs use the word more narrowly.
+The \emph{action flip rate} is the share of messages for which the two codebooks lead to different actions, split into
+under-escalation (the LLM codebook gives the less urgent action) and over-escalation.

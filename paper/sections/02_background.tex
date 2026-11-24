@@ -1,0 +1,118 @@
+\section{Background}
+\label{sec:background}
+
+This section introduces CWW and the \Perc{} (Section~\ref{sec:bg-cww}), methods for encoding words from data
+(Section~\ref{sec:bg-encoding}), what is known about verbal probability in people and LLMs
+(Section~\ref{sec:bg-verbal}), and the context of cognitive cities and AI in crisis lines (Section~\ref{sec:bg-cities}).
+
+\subsection{Computing with Words and the Perceptual Computer}
+\label{sec:bg-cww}
+
+\emph{Computing with Words} is a methodology in which the objects of computation are words and propositions from
+natural language rather than numbers \citep{zadeh1996fuzzy}.
+Zadeh motivates it with two observations: much of the information people use is too imprecise to justify numbers, and
+tolerance for imprecision can be exploited to obtain tractable and robust solutions.
+A word is modelled as a fuzzy set, whose elements belong to it to a degree between zero and one.
+
+The \emph{\Perc{}} makes CWW operational for subjective judgements \citep{mendel2001perceptual,mendel2010perceptual}.
+An \emph{encoder} transforms words into fuzzy-set models that are collected in a \emph{codebook}.
+A \emph{CWW engine} computes with these models, for example with if--then rules or weighted averages.
+A \emph{decoder} maps the engine output back to a word, a rank or a class that a person can act on.
+The design goal is an output that is useful to, and interpretable by, a human decision maker.
+
+Mendel argues that word models should be \emph{interval type-2 fuzzy sets} \citep{mendel2007computing}.
+A type-1 (T1) fuzzy set assigns each element one membership grade.
+An IT2 FS assigns each element an interval of grades, bounded below by a \emph{lower membership function} (LMF) and above
+by an \emph{upper membership function} (UMF); the region between them is the \emph{footprint of uncertainty} (FOU).
+Mendel grounds this choice in three principles \citep{mendel2007computing}.
+Following Turing, a CWW system is validated when its output cannot be distinguished from that of people.
+Following Popper, a T1 word model is an \emph{incorrect scientific theory}: once its parameters are fixed, its membership
+function is completely certain, whereas words mean different things to different people.
+The IT2 FS is therefore the minimal model that survives this falsification.
+Following Occam, among models and engines that give the \emph{same} results, the simplest should be chosen, which
+favours IT2 over general type-2 sets and simple operators over complex ones; Occam does not decide between alternatives
+that give different results.
+A forum of CWW researchers later showed that the field holds several complementary views of what CWW means
+\citep{mendel2010means}; this paper takes Mendel's engineering view of CWW as a \Perc{} that supports a human judgement.
+
+Two summaries of IT2 FSs are used throughout.
+The \emph{centroid} of an IT2 FS is an interval $[c_l, c_r]$, computed with the (Enhanced) Karnik--Mendel algorithms,
+and its midpoint serves as the set's \emph{centre} \citep{karnik2001centroid,wu2009ekm}.
+The \emph{Jaccard similarity} of two IT2 FSs compares their UMFs and LMFs and lies between zero (no overlap) and one
+(identical sets) \citep{wu2009comparative}.
+
+\subsection{Encoding Words from Data}
+\label{sec:bg-encoding}
+
+A codebook is only as credible as the data behind its word models.
+The \emph{Interval Approach} (IA) asks each subject for an interval of numbers that the word could mean
+\citep{liu2008ia}.
+After preprocessing that removes bad, outlying and unreasonable intervals, each surviving interval is mapped to a T1
+membership function, interpreted as an embedded set of the word's IT2 FS, and the union of these sets gives the FOU.
+The \emph{Enhanced Interval Approach} (EIA) tightens the data tests, improves the computation of the LMF and shows that
+the resulting word model converges as more intervals are collected, with about thirty intervals as a practical
+compromise \citep{wu2012eia}.
+The \emph{Interval Agreement Approach} (IAA) also starts from intervals but makes no shape assumption: the membership
+of a value is the share of intervals that contain it, which yields T1 sets and, through zSlices, general type-2 sets
+\citep{wagner2015iaa}.
+
+All three methods assume interval data: each person states a range for a word.
+Many existing data sets instead hold one number per person and word, as do the survey and LLM data used here.
+Section~\ref{sec:concept} therefore uses an adaptation that builds IT2 FSs from point estimates; it is inspired by
+these methods but is not one of them.
+
+\subsection{Verbal Probability in People and LLMs}
+\label{sec:bg-verbal}
+
+Kent, writing for analysts of the United States intelligence community, noticed that readers of the same estimate
+attached very different odds to the same phrase and proposed a fixed vocabulary of \emph{words of estimative
+probability} \citep{kent1964words}.
+Later studies measured these meanings directly.
+Wallsten et al.\ showed that the vague meanings of terms such as \word{doubtful} or \word{likely} can be measured as
+membership functions over the probability interval, with individual differences that were large but stable
+\citep{wallsten1986measuring}.
+Mosteller and Youtz compared numerical averages across studies and found that, despite different populations and
+formats, the averages of most expressions varied only modestly, which suggested that they could be codified; a notable
+exception was \word{possible}, which meant distinctly different things to different people \citep{mosteller1990quantifying}.
+Budescu et al.\ compared how readers in many countries and languages interpret the probability terms of the
+Intergovernmental Panel on Climate Change and found that interpretations differ from the intended numerical meanings
+\citep{budescu2014ipcc}.
+CAPphrase, the data set used in this paper, collects absolute and comparative judgements of \WoneNTerms{} probability
+phrases from several thousand online respondents \citep{kucharski2026capphrase}.
+
+Work on LLMs asks whether models share these meanings.
+Sileo and Moens found that out-of-the-box language models struggle to match the consensual probability level of such
+words and to reason with them, although fine-tuning helps \citep{sileo2023probing}.
+Belém et al.\ reported that seven of ten models map uncertainty expressions to numbers in a human-like way, but that
+their answers depend more than humans' on whether a statement is true \citep{belem2024perceptions}.
+Tang et al.\ found that established LLMs align with a human survey only for some words, and less so for gendered or
+Chinese prompts \citep{tang2026estimative}.
+A recent preprint comparing nineteen models reports that LLMs preserve the human ordering of eleven expressions but
+show a systematic upward bias for negative expressions such as \word{unlikely} and \word{improbable}
+\citep{petridis2026unlikely}.
+These studies compare LLM numbers with human central values.
+They do not model the spread of meanings as fuzzy sets, compare demographic groups, or test whether the differences
+matter for a decision; this paper does all three.
+
+\subsection{Cognitive Cities, Fuzzy Public Data and AI in Crisis Lines}
+\label{sec:bg-cities}
+
+\emph{Cognitive cities} extend the smart-city idea from efficient infrastructure to urban systems that learn from and
+interact with their citizens \citep{finger2016cognitive}.
+In this line of work, soft computing and CWW are proposed to let public services reason with the imprecise, linguistic
+information that citizens provide, for example in fuzzy reasoning for conversational agents
+\citep{donofrio2019fuzzy}.
+Spycher and Portmann evaluate crisp taxonomies of open government data and argue for a fuzzy, linguistic perspective
+on how public data are categorised \citep{spycher2026crispness}.
+This paper applies the same argument to the words a public service uses for risk: if the boundary between
+\word{possible} and \word{likely} is fuzzy and contested, a service should know whose boundary it uses.
+
+Crisis lines are a public service in which this matters.
+The Swiss helpline 143 introduced an AI chatbot for chat requests that volunteers cannot take, with a handover to people
+and telephone numbers in acute suicidality \citep{srf2026dargebotene}.
+The Dutch suicide-prevention line 113 follows a human-in-the-loop principle: a helpline conversation always takes place
+with a person, and AI tools support the counsellors rather than replace them
+\citep{zelfmoordpreventie113hulplijn,vu2024aitool}.
+Both designs need a decision about when an automated reply is not enough.
+The concept in Section~\ref{sec:concept} makes that decision transparent and shows whose meaning of each risk word it
+uses.

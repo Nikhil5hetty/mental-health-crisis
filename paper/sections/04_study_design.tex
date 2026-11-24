@@ -1,0 +1,171 @@
+\section{Study Design}
+\label{sec:design}
+
+The study combines three data sources: a public survey of probability words for the citizen codebook
+(Section~\ref{sec:design-capphrase}), answers that we elicited from four local LLMs for the LLM codebook
+(Section~\ref{sec:design-llm}), and crisis-line messages with crisis degrees and reply words for the decision test
+(Section~\ref{sec:design-bhh}).
+Section~\ref{sec:design-plan} describes the pre-registration, the metrics and hypotheses, and
+Section~\ref{sec:design-deviations} lists every deviation from the plan.
+
+\subsection{Citizen Data: CAPphrase}
+\label{sec:design-capphrase}
+
+CAPphrase is an online survey of probability phrases published under the CC~BY~4.0 licence
+\citep{kucharski2026capphrase}.
+We use its absolute judgements: \WoneNRespondents{} respondents each placed \WoneNTerms{} phrases, from
+\word{Almost No Chance} to \word{Will Happen}, on a scale from $0$ to $100$, giving \WoneNJudgements{} judgements with
+no missing values.
+The survey also contains \WoneConsistencyNPairs{} pairwise comparisons, in which a respondent chose the more likely of two
+phrases; we use them only to check the consistency of the absolute judgements.
+
+The respondents are not a sample of the Swiss population, and we call them \emph{respondents}, not citizens of any
+country (Table~\ref{tab:profile}).
+Most live in the United Kingdom (\WoneProfileCountryUnitedKingdomPct{}\%) or the United States
+(\WoneProfileCountryUnitedStatesPct{}\%), most hold a university degree (\WoneProfileEducationDegreePct{}\% bachelor or
+postgraduate), and \WoneProfileEnglishBackgroundEnglishIsMyFirstLanguagePct{}\% have English as their first language.
+We form \WoneNGroups{} demographic groups from English background (native; non-native, fluent or not) and age
+(18--34, 35--54, 55 and older).
+In total, \WoneNotInGroups{} respondents with a missing group attribute or an age under 18 belong to no group; they
+remain in all pooled analyses.
+The data were fetched at a pinned repository revision and checked against recorded SHA-256 hashes, and no value was
+changed or removed.
+
+\begin{table}[t]
+\caption{Profile of the CAPphrase respondents (share of all respondents; ``missing'' = not reported).}
+\label{tab:profile}
+\input{generated/tables/profile}
+\end{table}
+
+\subsection{LLM Data: Elicitation from Four Local Models}
+\label{sec:design-llm}
+
+We asked the following \WtwoNModels{} open-weight models, run locally with Ollama \citep{ollama2026}, for the meaning of each phrase:
+\WModelLlamaThreeOneEightB{} \citep{grattafiori2024llama3}, \WModelQwenTwoFiveSevenB{} \citep{qwen2024qwen25},
+\WModelGemmaTwoNineB{} \citep{gemma2024gemma2} and \WModelMistralSevenB{} \citep{jiang2023mistral}.
+Each model tag was pinned by its digest, which is stored with every answer (Table~\ref{tab:elicitation}).
+The primary prompt P1 asked:
+\begin{quote}
+\textit{On a scale from $0$ to $100$, what probability (in percent) does the phrase ``\textless term\textgreater{}''
+convey? Answer with a single number only.}
+\end{quote}
+The secondary prompt P2 prefixed P1 with \textit{``You are a member of the public living in Switzerland.''}
+For each model, prompt and phrase we drew \WSamples{} answers at temperature \WTemperature{}, with seed
+\WSeedBase{} plus the sample index, so that the answers form a sample of the model's meaning rather than a single
+deterministic reply.
+In total, \WtwoAnswersTotalNRows{} answers were requested.
+
+An answer was valid only if it was a bare number in $[0, 100]$, optionally followed by a percent sign or a full stop
+(decisions D18 and D19, Appendix~\ref{app:decisions}).
+An invalid answer was asked again in the same conversation, up to \WMaxReasks{} times, and otherwise recorded as missing.
+The rule was tightened before any analysis: a first, looser rule took the first number in a reply and read verbose
+replies such as ``Step~$1$: \dots'' as the number one.
+The \WtwoAnswersTotalNSuperseded{} affected \WModelLlamaThreeOneEightB{} answers were moved, unchanged, to a separate
+file of superseded rows and elicited again under the strict rule.
+Generation was capped at \WNumPredict{} tokens.
+The stop reason was recorded for all answers except the original \WModelLlamaThreeOneEightB{} rows, which predate that
+field (D18); among the recorded ones, \WtwoAnswersTotalNLength{} final attempts hit the cap.
+Three models answered every request validly; \WModelMistralSevenB{} left
+\WtwoAnswersMistralSevenBPOneInvalidRatePct{}\% (P1) and \WtwoAnswersMistralSevenBPTwoInvalidRatePct{}\% (P2) of its
+answers missing.
+
+\begin{table}[t]
+\caption{LLM elicitation per model and prompt: valid answers, share missing after re-asks, answers that needed a
+re-ask, final attempts that hit the token cap, answers superseded under D19, and terms excluded for fewer than
+\WMinN{} valid answers.}
+\label{tab:elicitation}
+\input{generated/tables/elicitation}
+\end{table}
+
+\subsection{Crisis-Line Data: Between Help and Harm}
+\label{sec:design-bhh}
+
+The decision test uses the validation set of \emph{Between Help and Harm} (BHH), user messages written to probe
+crisis handling by chatbots \citep{arnaizrodriguez2026help}.
+BHH states no licence; we use the data for non-commercial research with citation, redistribute nothing and reproduce no
+message text.
+Each message was labelled with a crisis category by three LLMs (\texttt{gpt-4o-mini}, \texttt{gpt-5-nano} and
+\texttt{meta-llama/Llama-4-Scout-17B-16E-Instruct}) in three runs each.
+The crisis degree of a message is $m = 100 \cdot k / n$, where $n$ is the number of observed labels (between
+\WthreeMinObserved{} and \WthreeMaxObserved{}; missing labels stay missing, decision D13) and $k$ the number that name a
+crisis category.
+The reply word is the appropriateness verdict for the chatbot reply to the same message, taken from our earlier study,
+in which a CWW panel decoder aggregated the three LLM judges' ratings on BHH's five-point scale
+(Appendix~\ref{app:decisions}).
+We use the \WthreeNItems{} messages for which both values are complete.
+Because $m$ takes few distinct values (\WthreeNDistinctM{}), many messages share a crisis degree.
+
+\subsection{Pre-Registration, Metrics and Hypotheses}
+\label{sec:design-plan}
+
+The analysis plan was frozen in the project repository in commit \PlanWordsCommit{} at \PlanWordsUtc{} (UTC), before
+the CAPphrase data were fetched (\CapphraseFetchedUtc{}) and before the first LLM answer was elicited
+(\ElicitStartUtc{}).
+This pre-registration is internal and commit-timestamped in the project repository, not filed in a public registry
+\citep{nosek2018preregistration}.
+All tests are exploratory, and we apply no correction for multiple comparisons.
+Every result in this paper is produced by a script, with fixed seeds, that writes to the results folder of the
+repository; reruns were byte-identical, and every number in the text is generated from those files.
+
+\paragraph{RQ1: citizen codebook.}
+We encode one quantile trapezoid per phrase from all respondents (the pooled T1 set) and one per demographic group, and
+take the envelope over the groups as the citizen IT2 word model (Section~\ref{sec:concept-encoder}).
+For each phrase we report the IQR, the FOU area (the sum of $\overline{\mu} - \underline{\mu}$ times the grid step
+$0.5$), the centroid and centre, and the Jaccard similarity between each pair of group sets.
+Two sensitivity analyses check the codebook: a bootstrap envelope over \WoneBootB{} resamples of whole respondents, and
+the exclusion of inattentive respondents who rated \word{Almost No Chance} at least as high as \word{Almost Certain}.
+The pairwise comparisons give the share of choices that agree with the same respondent's absolute values.
+
+\paragraph{RQ2: LLM codebook.}
+We encode one quantile trapezoid per model and phrase from its valid answers to P1, and take the envelope over the models
+as the LLM IT2 word model; P2 serves as a sensitivity analysis.
+Per phrase we compare citizens and LLMs with the Jaccard similarity of the IT2 sets, the Jaccard similarity of the pooled
+citizen T1 set and each model's set, the centre shift, and the width ratio per model and for all models' answers pooled
+(Section~\ref{sec:concept-compare}).
+Confidence intervals are 95\% percentile intervals from \WtwoBootB{} bootstrap replicates, each resampling whole
+respondents and, independently, each model's answers per phrase.
+Two hypotheses are tested:
+\begin{itemize}
+\item \textbf{H2a:} LLMs and citizens overlap \emph{less} for hedge words than for extreme words.
+With $D$ the mean Jaccard of the \WNHedge{} hedge words (\word{Realistic Possibility}, \word{Could Happen},
+\word{May Happen}, \word{Might Happen}, \word{Probable}, \word{Likely}) minus that of the \WNExtreme{} extreme words
+(\word{Almost No Chance}, \word{Almost Certain}, \word{Will Happen}), H2a is supported if the confidence interval of $D$
+lies entirely below zero.
+\item \textbf{H2b:} LLMs use most words more narrowly than citizens.
+For each model and for the pooled answers, H2b is supported if the confidence interval of the share of phrases with a
+smaller LLM IQR than citizen IQR lies entirely above $0.5$.
+\end{itemize}
+Model--phrase cells whose trapezoid collapses ($q_{0.05} = q_{0.95}$) are reported descriptively.
+
+\paragraph{RQ3: decisions.}
+Each message's crisis degree is verbalised with the citizen IT2 codebook, the LLM IT2 codebook (P1) and each group's T1
+codebook, and mapped to an action with the rule table (Section~\ref{sec:concept-decoder}).
+We report the word disagreement rate, the action flip rate and the under- and over-escalation rates of the LLM codebook
+against the citizen codebook and against each group's codebook, with 95\% percentile intervals from \WthreeBootB{}
+bootstrap resamples of messages.
+\textbf{H3:} the action flip rate of the LLM codebook against the citizen codebook is positive; it is supported if the
+lower bound of its confidence interval is above zero.
+All bootstraps use seed \WSeed{}.
+
+\subsection{Deviations from the Plan}
+\label{sec:design-deviations}
+
+Each deviation is listed below with its timing and is recorded in the decision log (Appendix~\ref{app:decisions}).
+\begin{itemize}
+\item \textbf{Parsing (D18, D19).} The plan asked for the first number in $[0, 100]$. After inspecting the first model's
+raw replies and before any analysis, we adopted the strict bare-number rule described above; the superseded answers are
+kept.
+\item \textbf{Minimum sample per model (D20).} A model--phrase cell with fewer than \WMinN{} valid answers is excluded
+from the LLM codebook; this affected \WtwoExcludedCellsPOne{} cell under P1 and \WtwoExcludedCellsPTwo{} under P2. The
+plan did not state this rule; it mirrors the rule for citizen groups.
+\item \textbf{Bootstrap unit.} Citizens are resampled as whole respondents, so that the dependence between a respondent's
+answers to different phrases is kept; the plan did not specify the unit.
+\item \textbf{Undefined width ratio (D20).} The width ratio is undefined when the citizen IQR is zero, which occurred for
+\word{About Even}. This rule was added after the first run on the real data stopped on a division by zero; it changes no
+other number.
+\item \textbf{Fallback verbalisation (D20).} The plan did not anticipate crisis degrees that no level word covers. The
+nearest-centre fallback of Section~\ref{sec:concept-decoder} was set before the real run; two sensitivity analyses of it
+were added after the result was known and are labelled post hoc.
+\item \textbf{Respondent profile.} The descriptive profile in Table~\ref{tab:profile} was added for this paper; it is not
+part of the plan and enters no test.
+\end{itemize}

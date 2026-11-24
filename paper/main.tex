@@ -1,0 +1,64 @@
+% Seminar paper: Same word, different meaning -- citizen and LLM probability words in a crisis-line Perceptual Computer.
+% Build: make (latexmk) or make tectonic. Overleaf: upload paper/ as is; main document = main.tex.
+\documentclass[manuscript,screen,nonacm]{acmart}
+\citestyle{acmauthoryear}
+
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+\input{generated/numbers}
+
+% Terminology helpers (no numbers).
+\newcommand{\Perc}{Perceptual Computer}
+\newcommand{\word}[1]{\textsf{#1}}
+
+\begin{document}
+
+\title[Same Word, Different Meaning]{Same Word, Different Meaning: Citizen and LLM Readings of Probability Words in a Crisis-Line Perceptual Computer}
+\subtitle{Seminar Urban Computing, HS2026 --- Examiner: Prof.\ Dr.\ Edy Portmann; Supervisor: Janick Spycher}
+
+\author{Nikhil Shetty}
+\authornote{Matriculation number: TODO (authors).}
+\affiliation{%
+  \institution{University of Bern, BeNeFri}
+  \city{Bern}
+  \country{Switzerland}}
+
+\author{Rajeshwar Rao}
+\authornote{Matriculation number: TODO (authors).}
+\affiliation{%
+  \institution{University of Bern, BeNeFri}
+  \city{Bern}
+  \country{Switzerland}}
+
+\renewcommand{\shortauthors}{Shetty and Rao}
+
+\begin{abstract}
+\input{sections/00_abstract}
+\end{abstract}
+
+\keywords{computing with words, perceptual computer, interval type-2 fuzzy sets, verbal probability, large language models,
+crisis lines, cognitive cities, codebook governance}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_concept}
+\input{sections/04_study_design}
+\input{sections/05_results}
+\input{sections/06_prototype}
+\input{sections/07_discussion}
+\input{sections/08_conclusion}
+\input{sections/09_ai_declaration}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+\appendix
+\input{sections/A_manual}
+\input{sections/B_decisions}
+\input{sections/C_tables}
+
+\end{document}

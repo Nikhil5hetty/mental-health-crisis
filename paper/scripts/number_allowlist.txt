@@ -1,0 +1,39 @@
+# Numbers allowed as literals in the paper's hand-written .tex files.
+# Every entry needs a source. Result numbers never belong here: use paper/generated/numbers.tex.
+# Format: <literal>  # <reason and source>
+
+# CWW parameters defined in docs/METHOD.md
+0.5    # universe step of the word study (plan: 0-100, step 0.5); earlier study: IAA Likert-bin half-width (METHOD 4)
+0.25   # default fou_width of the appropriateness codebook (METHOD 7); S4 orness (plan RQ2)
+0.01   # universe sampling step (METHOD 1)
+2.4    # EKM initial switch point N/2.4 (METHOD 2)
+1.7    # EKM initial switch point N/1.7 (METHOD 2)
+0.75   # codebook trapezoid shoulder offset k +/- 0.75 (METHOD 7)
+51     # number of alpha levels in the FWA/LWA (METHOD 5)
+
+# Frozen analysis-plan constants (docs/ANALYSIS_PLAN_RQ2.md, docs/ANALYSIS_PLAN_RQ1_DEMO.md)
+0.05   # contested margin top-1 minus top-2 Jaccard; escalate-when-unsure margin (plan RQ2)
+0.10   # precision non-inferiority margin of H2a (plan RQ2)
+0.4    # sensitivity grid of the contested threshold (plan RQ2)
+0.6    # sensitivity grid of the contested threshold (plan RQ2)
+0.99   # D11 answer similarity threshold (DECISIONS D11)
+95     # 95% confidence intervals (plans)
+
+# Public crisis-service phone numbers (names of services, not results)
+113    # 113 Zelfmoordpreventie (Netherlands)
+143    # Die Dargebotene Hand (Switzerland)
+147    # Pro Juventute helpline for young people (Switzerland)
+144    # Swiss emergency medical number
+112    # European emergency number
+
+# Licence versions (names, not results)
+4.0    # CC BY-NC-ND 4.0 (CounselBench licence)
+
+# Word-meaning study: frozen plan constants (docs/ANALYSIS_PLAN_WORDS.md)
+100    # upper end of the probability scale 0-100 (plan: universe 0-100) and of the crisis degree m
+18     # citizen age band 18-34 (plan RQ1 groups)
+34     # citizen age band 18-34 (plan RQ1 groups)
+35     # citizen age band 35-54 (plan RQ1 groups)
+54     # citizen age band 35-54 (plan RQ1 groups)
+55     # citizen age band 55+ (plan RQ1 groups)
+0.95   # quantile q_0.95 of the quantile trapezoid (plan: q05, q25, q75, q95); also used with 0.05, 0.25, 0.75 above
