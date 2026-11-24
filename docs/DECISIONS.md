@@ -68,3 +68,5 @@ D11 clarification (user approved): match literal plus signs using
 | D13 | Missing LLM crisis labels (27 empty labels across 21 items in the 9 validation runs) stay missing and are never read as no_crisis. Crisis degree = k_crisis / n_observed; n_observed is stored per item (minimum 6 of 9). |
 | D14 | Non-string text artefacts: answer_text is null, with artefact_type and artefact_value columns. Original strings are kept unchanged. |
 | D15 | RQ2 rulings: verdicts use paired-difference CIs vs S2; identical systems stay "inconclusive"; the added M3b/M5 paired differences are accepted as deviations; the 10 hypothesis comparisons are reported as exploratory (no multiplicity correction). |
+| D16 | PR #22 deviations accepted; the planned post-hoc demo sensitivity is superseded by the word-meaning pivot (D17) and not implemented. |
+| D17 | Pivot (2026-11-24): main study = citizen vs LLM word models (docs/ANALYSIS_PLAN_WORDS.md); earlier RQ1/RQ2/CounselBench results become the motivation section; PR #23 kept as the paper template. |
