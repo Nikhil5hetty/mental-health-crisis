@@ -2,9 +2,10 @@
 """Elicit LLM probability values for the CAPphrase terms (docs/ANALYSIS_PLAN_WORDS.md, RQ2).
 
 For each model x prompt (P1, P2) x term (19) x sample (50) one answer is requested from a local Ollama
-server with temperature 1.0 and seed = 20261124 + sample index. The answer is parsed as the first number
-in the text, which must lie in [0, 100]. If it does not parse, the same prompt is asked again in the same
-conversation (the failed reply stays in the history), up to 2 times; after that the value is missing.
+server with temperature 1.0 and seed = 20261124 + sample index. A reply is valid only if, after stripping
+white space, it is a bare number with an optional % and an optional trailing period, and the number lies in
+[0, 100] (strict parsing, D19). Otherwise the same prompt is asked again in the same conversation (the failed
+reply stays in the history, same seed), up to 2 times; after that the value is missing.
 
 Output: data/llm_answers/answers.csv, append-only and resumable. One row per (model, prompt_id, term, sample);
 rows already present are skipped, so an interrupted run continues where it stopped. Missing answers are rows
@@ -13,6 +14,8 @@ row, and a run refuses to append answers for a tag whose digest differs from row
 
     python -I experiments/words/elicit_llm.py              # real run (Ollama must be running)
     python -I experiments/words/elicit_llm.py --dry-run    # fake model, writes data/processed/
+    python -I experiments/words/elicit_llm.py --requeue-invalid   # move pre-D19 accepted rows that fail
+                                                                  # strict parsing to superseded.csv
 """
 from __future__ import annotations
 
@@ -20,6 +23,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -32,6 +36,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = Path(__file__).with_name('models.yaml')
 OUT = ROOT / 'data/llm_answers/answers.csv'
+SUPERSEDED_NAME = 'superseded.csv'  # next to the answers file
 DRY_RUN_OUT = ROOT / 'data/processed/llm_answers_dryrun.csv'
 
 # The 19 CAPphrase terms, spelled as in data/raw/capphrase/absolute_judgements.csv (checked by a test).
@@ -53,8 +58,13 @@ MAX_REASKS = 2
 NUM_PREDICT = 64  # cap on generated tokens; a single number needs far fewer
 TIMEOUT_S = 300
 
-COLUMNS = ['model', 'digest', 'prompt_id', 'term', 'sample', 'raw_text', 'value', 'attempts', 'timestamp']
-NUMBER = re.compile(r'(?<![\d.])-?\d+(?:\.\d+)?')
+OLD_COLUMNS = ['model', 'digest', 'prompt_id', 'term', 'sample', 'raw_text', 'value', 'attempts', 'timestamp']
+# done_reason: Ollama's done_reason for the final attempt ('stop', or 'length' if NUM_PREDICT was hit).
+# Files written before it existed are upgraded on first use with an empty done_reason (D18 ruling 3).
+COLUMNS = OLD_COLUMNS + ['done_reason']
+SUP_EXTRA = ['reason']
+BARE_NUMBER = re.compile(r'^(-?\d+(?:\.\d+)?)\s*%?\s*\.?$')  # D19
+REQUEUE_REASON = 'D19: raw_text is not a bare number in [0, 100]'
 
 
 def prompt_text(prompt_id: str, term: str) -> str:
@@ -67,24 +77,27 @@ def prompt_text(prompt_id: str, term: str) -> str:
 
 
 def parse_value(text: str | None) -> float | None:
-    """First number in the text; valid only if it lies in [0, 100]. '70-80' -> 70, 'N/A' -> None."""
-    m = NUMBER.search(text or '')
+    """Strict parsing (D19): '70', '70%', ' 72.5 ', '70.' -> number; '## Step 1: ...', '70-80', 'about 70' -> None."""
+    m = BARE_NUMBER.match((text or '').strip())
     if m is None:
         return None
-    value = float(m.group())
+    value = float(m.group(1))
     return value if 0 <= value <= 100 else None
 
 
-def ask(client, model: str, prompt: str, seed: int) -> tuple[str, float | None, int]:
-    """Ask once, then re-ask the same prompt up to MAX_REASKS times. Returns (raw_text, value, attempts)."""
+def ask(client, model: str, prompt: str, seed: int) -> tuple[str, float | None, int, str]:
+    """Ask once, then re-ask the same prompt up to MAX_REASKS times.
+
+    Returns (raw_text, value, attempts, done_reason), all of the final attempt.
+    """
     messages = [{'role': 'user', 'content': prompt}]
     for attempt in range(1, MAX_REASKS + 2):
-        raw = client.chat(model, messages, seed)
+        raw, done_reason = client.chat(model, messages, seed)
         value = parse_value(raw)
         if value is not None:
-            return raw, value, attempt
+            return raw, value, attempt, done_reason
         messages += [{'role': 'assistant', 'content': raw}, {'role': 'user', 'content': prompt}]
-    return raw, None, attempt
+    return raw, None, attempt, done_reason
 
 
 class OllamaClient:
@@ -105,12 +118,12 @@ class OllamaClient:
                     out[m[key]] = m['digest']
         return out
 
-    def chat(self, model: str, messages: list[dict], seed: int) -> str:
+    def chat(self, model: str, messages: list[dict], seed: int) -> tuple[str, str]:
         resp = self._request('/api/chat', {
             'model': model, 'messages': messages, 'stream': False,
             'options': {'temperature': TEMPERATURE, 'seed': seed, 'num_predict': NUM_PREDICT},
         })
-        return resp['message']['content']
+        return resp['message']['content'], resp.get('done_reason') or ''
 
 
 class FakeClient:
@@ -122,11 +135,12 @@ class FakeClient:
     def tags(self) -> dict[str, str]:
         return {m: 'dry-run' for m in self.models}
 
-    def chat(self, model: str, messages: list[dict], seed: int) -> str:
+    def chat(self, model: str, messages: list[dict], seed: int) -> tuple[str, str]:
         key = json.dumps([model, messages, seed]).encode()
         h = int.from_bytes(hashlib.sha256(key).digest()[:8], 'big')
         v = h % 101
-        return [f'{v}', f'About {v}%', f'{v}-{min(v + 10, 100)}', 'N/A'][(h >> 8) % 4]
+        i = (h >> 8) % 4
+        return [f'{v}', f'{v}%', f'About {v}%', '## Step 1: Understand the phrase'][i], 'length' if i == 3 else 'stop'
 
 
 def normalise_tag(tag: str) -> str:
@@ -140,23 +154,111 @@ def load_config(path: Path) -> dict:
     return cfg
 
 
+def read_rows(path: Path, extra: list[str] = ()) -> tuple[list[dict], bool]:
+    """Rows with the current columns (+ extra). The pre-done_reason schema is accepted: done_reason = ''.
+
+    Returns (rows, is_old_schema).
+    """
+    new, old = COLUMNS + list(extra), OLD_COLUMNS + list(extra)
+    with path.open(newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames not in (new, old):
+            raise SystemExit(f'{path}: unexpected header {reader.fieldnames}')
+        is_old = reader.fieldnames == old
+        rows = [{c: r.get(c, '') for c in new} for r in reader]
+    return rows, is_old
+
+
+def write_rows(path: Path, rows: list[dict], extra: list[str] = ()) -> None:
+    """Atomically replace ``path`` with ``rows`` in the current schema."""
+    cols = COLUMNS + list(extra)
+    tmp = path.with_suffix(path.suffix + '.tmp')
+    with tmp.open('w', newline='', encoding='utf-8') as f:
+        w = csv.writer(f)
+        w.writerow(cols)
+        w.writerows([r[c] for c in cols] for r in rows)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
+def upgrade_schema(path: Path, extra: list[str] = (), log=print) -> None:
+    """Add the empty done_reason column to a file in the old schema. No other value changes."""
+    if not path.is_file() or path.stat().st_size == 0:
+        return
+    rows, is_old = read_rows(path, extra)
+    if is_old:
+        write_rows(path, rows, extra)
+        log(f'{path}: added empty done_reason column to {len(rows)} existing rows')
+
+
 def read_existing(out: Path) -> tuple[set, dict[str, str]]:
     """Keys already written and the digest recorded per model."""
     done, digests = set(), {}
     if not out.is_file() or out.stat().st_size == 0:
         return done, digests
-    with out.open(newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        if reader.fieldnames != COLUMNS:
-            raise SystemExit(f'{out}: unexpected header {reader.fieldnames}')
-        for r in reader:
-            key = (r['model'], r['prompt_id'], r['term'], int(r['sample']))
-            if key in done:
-                raise SystemExit(f'{out}: duplicate row {key}')
-            done.add(key)
-            if digests.setdefault(r['model'], r['digest']) != r['digest']:
-                raise SystemExit(f'{out}: several digests for {r["model"]}')
+    for r in read_rows(out)[0]:
+        key = (r['model'], r['prompt_id'], r['term'], int(r['sample']))
+        if key in done:
+            raise SystemExit(f'{out}: duplicate row {key}')
+        done.add(key)
+        if digests.setdefault(r['model'], r['digest']) != r['digest']:
+            raise SystemExit(f'{out}: several digests for {r["model"]}')
     return done, digests
+
+
+def requeue_invalid(out: Path, log=print) -> dict[tuple, int]:
+    """Move accepted rows whose raw_text fails strict parsing (D19) from ``out`` to superseded.csv.
+
+    Rows are never edited: each moved row is appended unchanged to superseded.csv with a reason column, then
+    ``out`` is rewritten without it, so a normal run re-requests exactly those keys. Rows that are already
+    missing (all attempts failed the old, looser rule, hence also the strict one) are the strict outcome and stay.
+    Kept rows must parse to their stored value. Returns the moved count per (model, prompt_id, term).
+    """
+    if not out.is_file():
+        raise SystemExit(f'{out} does not exist')
+    rows, _ = read_rows(out)
+    keep, move = [], []
+    for r in rows:
+        value = parse_value(r['raw_text'])
+        if value is None and r['value'] != '':
+            move.append(r)
+            continue
+        if value is not None and r['value'] != f'{value:g}':
+            raise SystemExit(f'{out}: stored value {r["value"]} differs from strict parse {value} for {r}')
+        keep.append(r)
+
+    counts: dict[tuple, int] = {}
+    for r in move:
+        k = (r['model'], r['prompt_id'], r['term'])
+        counts[k] = counts.get(k, 0) + 1
+    n_missing = sum(1 for r in keep if r['value'] == '')
+    log(f'{len(rows)} rows in {out}: {len(move)} to requeue, {len(keep)} kept '
+        f'({n_missing} already missing after all attempts)')
+    for (model, pid, term), n in sorted(counts.items()):
+        log(f'  {model}\t{pid}\t{term}\t{n}')
+    if not move:
+        return counts
+
+    sup = out.with_name(SUPERSEDED_NAME)
+    sup_cols = COLUMNS + SUP_EXTRA
+    upgrade_schema(sup, SUP_EXTRA, log=log)
+    seen = set()
+    if sup.is_file() and sup.stat().st_size:
+        seen = {tuple(r[c] for c in COLUMNS) for r in read_rows(sup, SUP_EXTRA)[0]}
+    new_sup = not sup.is_file() or sup.stat().st_size == 0
+    with sup.open('a', newline='', encoding='utf-8') as f:  # append first: a crash never loses a row
+        w = csv.writer(f)
+        if new_sup:
+            w.writerow(sup_cols)
+        for r in move:
+            if tuple(r[c] for c in COLUMNS) not in seen:  # rerun after a crash between the two writes
+                w.writerow([r[c] for c in COLUMNS] + [REQUEUE_REASON])
+        f.flush()
+        os.fsync(f.fileno())
+    write_rows(out, keep)  # also upgrades an old-schema file (empty done_reason)
+    log(f'Moved {len(move)} rows to {sup}; rerun without --requeue-invalid to request them again')
+    return counts
 
 
 def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS,
@@ -168,6 +270,7 @@ def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS
         raise SystemExit(f'Models not available in Ollama: {missing}. Run: ollama pull <tag>')
     digest = {m: available[normalise_tag(m)] for m in models}
 
+    upgrade_schema(out, log=log)
     done, recorded = read_existing(out)
     for m in models:
         if m in recorded and recorded[m] != digest[m]:
@@ -180,7 +283,7 @@ def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS
     log(f'{total} answers planned, {total - todo} already in {out}, {todo} to request')
     out.parent.mkdir(parents=True, exist_ok=True)
     new_file = not out.is_file() or out.stat().st_size == 0
-    written, start = 0, time.monotonic()
+    written, capped, start = 0, 0, time.monotonic()
     with out.open('a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         if new_file:
@@ -191,16 +294,19 @@ def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS
                     for sample in range(n_samples):
                         if (model, pid, term, sample) in done:
                             continue
-                        raw, value, attempts = ask(client, model, prompt_text(pid, term), SEED_BASE + sample)
+                        raw, value, attempts, done_reason = ask(client, model, prompt_text(pid, term),
+                                                                SEED_BASE + sample)
                         writer.writerow([model, digest[model], pid, term, sample, raw,
                                          '' if value is None else f'{value:g}', attempts,
-                                         datetime.now(timezone.utc).isoformat(timespec='seconds')])
+                                         datetime.now(timezone.utc).isoformat(timespec='seconds'), done_reason])
                         f.flush()
                         written += 1
+                        capped += done_reason == 'length'
                         if written % 100 == 0:
                             rate = (time.monotonic() - start) / written
                             log(f'{written}/{todo} written, about {rate * (todo - written) / 60:.0f} min left')
-    log(f'Done: {written} rows written to {out}')
+    log(f'Done: {written} rows written to {out}; {capped} final replies hit num_predict={NUM_PREDICT} '
+        "(done_reason == 'length')")
     return written
 
 
@@ -210,8 +316,14 @@ def main(argv=None) -> int:
     ap.add_argument('--out', type=Path)
     ap.add_argument('--dry-run', action='store_true', help='use a fake model; never touches the real output')
     ap.add_argument('--models', nargs='+', help='subset of the configured models')
+    ap.add_argument('--requeue-invalid', action='store_true',
+                    help='move accepted rows that fail strict parsing (D19) to superseded.csv, then exit')
     ap.add_argument('--samples', type=int, default=N_SAMPLES, help='samples per term (plan: 50; smaller only to test)')
     args = ap.parse_args(argv)
+
+    if args.requeue_invalid:
+        requeue_invalid(args.out or OUT)
+        return 0
 
     cfg = load_config(args.config)
     models = args.models or list(cfg['models'])
