@@ -1,181 +1,261 @@
-# Mental Health Crisis Detection in LLMs
+# Same Word, Different Meaning: Respondent vs LLM Word Models for Crisis-Line Risk Communication
 
-## Working title
-**Evaluating LLM Safety Systems for Mental Health Crisis Detection Across Datasets and Conversational Contexts**
+A crisis-line chatbot that judges urgency has to put that judgement into words such as *likely* or *realistic
+possibility*. This project asks whether survey respondents and large language models (LLMs) mean the same thing by
+such probability words, and whether the difference changes the escalation decision of a crisis-line
+[Perceptual Computer](#approach). It builds a citizen codebook and an LLM codebook of interval type-2 fuzzy sets,
+compares them word by word, and runs both through the same decision rule.
 
-## Project overview
-This seminar project studies how reliably LLM safety systems identify mental-health crises, with two complementary research directions:
+*Seminar Urban Computing, HS2026, Human-IST Institute, University of Fribourg (BeNeFri). Authors: Nikhil Shetty and
+Rajeshwar Rao.*
 
-1. **Cross-dataset generalization** — whether crisis-detection performance transfers across independently constructed datasets when labels are harmonized.
-2. **Context-aware / multi-turn detection** — whether accumulating conversational context improves the accuracy, timing, and stability of crisis detection.
+> **Research prototype, not for clinical use.** The escalation rules (`src/cww/rules.py`) are a design proposal and
+> are not clinically validated. Nothing in this repository should be used to make decisions about people in crisis.
 
-The project is motivated by:
-- [Nelson et al. (2026), *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*](https://doi.org/10.1038/s41746-026-02579-5).
-- [Arnaiz-Rodriguez et al. (2026), *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*](https://doi.org/10.2196/88435).
+## Contents
 
-A core design principle is that the project should remain executable without request-only artifacts. Public datasets and open-weight guardrails form the baseline; Verily materials strengthen the study if access is granted.
+- [Research questions and hypotheses](#research-questions-and-hypotheses)
+- [Key results](#key-results)
+- [Approach](#approach)
+- [Data](#data)
+- [Setup](#setup)
+- [Reproduce](#reproduce)
+- [Repository structure](#repository-structure)
+- [Pre-registration and decisions](#pre-registration-and-decisions)
+- [Earlier exploratory study](#earlier-exploratory-study)
+- [Ethics and licences](#ethics-and-licences)
+- [Known issues](#known-issues)
+- [How to cite](#how-to-cite)
 
-## Research questions
-- **RQ1:** How well do dedicated safety guardrails and general-purpose LLM classifiers generalize across independently constructed mental-health crisis datasets under a harmonized taxonomy?
-- **RQ2:** Does increasing conversational context improve crisis-detection performance compared with evaluating the current message alone?
-- **RQ3:** How early relative to an annotated crisis-onset point do different guardrails detect an emerging crisis?
-- **RQ4:** How robust is detection when explicit suicide/self-harm cues are absent but contextual indicators accumulate across turns?
+## Research questions and hypotheses
 
-## Harmonized taxonomy
-Initial shared categories:
-- No crisis
-- Suicide / suicidal ideation
-- Self-harm
-- Substance misuse / abuse / withdrawal
-- Violence toward others / violent thoughts
+Worded as in the frozen plan [docs/ANALYSIS_PLAN_WORDS.md](docs/ANALYSIS_PLAN_WORDS.md). The plan calls the survey
+side "citizen"; in this project the CAPphrase data are called *respondents*, and "citizen codebook" is the defined term
+for the word models built from them.
 
-## Candidate datasets
-- **Between Help and Harm:** 206 expert-annotated validation examples + 2,046 larger test examples.
-- **Verily Mental Health Crisis Dataset v1.0:** 1,800 clinician-reviewed simulated messages; available on researcher request.
-- **Clinician-reviewed NVIDIA subset used by Verily:** 794 suicide/self-harm-related messages with clinician corrections.
-- **AEGIS2.0:** public general safety dataset with 34,248 human–LLM interaction samples.
+**Question:** "Do citizens and LLMs mean the same thing by probability words, and does a mismatch change escalation
+decisions of a crisis-line Perceptual Computer?"
 
-## Candidate model groups
-### General-purpose LLM classifiers
-At least one model/setup from *Between Help and Harm* for continuity.
+| | As in the plan | In plain language |
+|---|---|---|
+| **RQ1** | Citizen word models | What do probability words mean to survey respondents, and how much do demographic groups disagree? |
+| **RQ2** | LLM word models | Do four local LLMs mean the same thing by these words, and are their meanings narrower? |
+| **RQ3** | Consequence for escalation | Does swapping the citizen codebook for the LLM codebook change the crisis-line action? |
+| **H2a** | "mean Jaccard of hedge terms {Realistic Possibility, Could Happen, May Happen, Might Happen, Probable, Likely} < mean Jaccard of extreme terms {Almost No Chance, Almost Certain, Will Happen}." | LLMs and respondents should agree *less* on vague hedge words than on extreme words. |
+| **H2b** | "LLM IQR < citizen IQR for a majority of terms (per model and pooled)." | LLMs use most words more narrowly than respondents do. |
+| **H3** | "action flip rate LLM vs citizen > 0 (CI excludes 0)." | The word mismatch changes at least some crisis-line actions. |
 
-### Dedicated guardrails
-- NVIDIA NeMoGuard
-- Qwen3Guard-Gen-8B
-- Llama Guard family
-- optional Nemotron content-safety reasoning
-- optional OpenAI moderation baseline
+All tests are exploratory; verdicts follow the CI rule stated in the plan.
 
-### Mental-health-specific guardrail
-- Verily Mental Health Guardrail (VMHG), if code/prompts/configuration are provided.
+## Key results
 
-## Direction 1 — Cross-dataset evaluation
-Evaluate the same detector families across harmonized datasets.
+The numbers live in the generated summaries, not here, so they cannot go stale.
 
-Primary metrics:
-- sensitivity / recall
-- specificity
-- precision
-- F1
-- false-positive rate
-- false-negative rate
-- per-category recall
-- confidence intervals and paired comparisons
+- **RQ1:** respondents agree closely on anchor words such as *Almost No Chance* and *About Even*, and the
+  demographic groups differ most on words such as *Unlikely*, *Probable* and *Remote Chance*. → [results/words/rq1/SUMMARY.md](results/words/rq1/SUMMARY.md)
+- **RQ2:** LLM meanings overlap only partly with the citizen codebook; H2a is reversed (extremes diverge more than
+  hedges), H2b holds for three of four models, and models often collapse a word to one number. →
+  [results/words/rq2/SUMMARY.md](results/words/rq2/SUMMARY.md)
+- **RQ3:** the LLM codebook flips a small share of actions, all between "continue" and "suggest a helpline", partly
+  through a gap in the LLM codebook; H3 is supported, including in two post-hoc sensitivity analyses. →
+  [results/words/rq3/SUMMARY.md](results/words/rq3/SUMMARY.md)
 
-## Direction 2 — Multi-turn context-aware detection
-Evaluate evolving conversations using:
-- current message only
-- short user-history window
-- full user-message history
+## Approach
 
-Potential labels:
-- 0 = no detectable crisis
-- 1 = ambiguous / concerning
-- 2 = identifiable crisis
-
-Key measurements:
-- classification metrics
-- detection delay
-- post-onset consistency
-- explicit-cue ablation
-- context-length ablation
-
-## Option A feasibility work
-The first reproducibility experiment is documented in [experiments/option_a/README.md](experiments/option_a/README.md).
-
-Using the public annotation artifacts from the *Between Help and Harm* repository, the paper's validation agreement was reproduced to rounding:
-- GPT-4o-mini: Cohen κ ≈ **0.645**
-- GPT-5-nano: Cohen κ ≈ **0.631**
-- Llama-4-Scout: Cohen κ ≈ **0.581**
-- Human-human mean pairwise Cohen κ ≈ **0.553**
-
-## LLM word elicitation (WP2)
-`experiments/words/elicit_llm.py` asks local open-weight models what probability each of the 19 CAPphrase terms conveys. It follows the RQ2 section of [docs/ANALYSIS_PLAN_WORDS.md](docs/ANALYSIS_PLAN_WORDS.md).
-
-**What it does**
-- Requests 4 models × 2 prompts (P1, P2) × 19 terms × 50 samples = 7,600 answers.
-- Uses temperature 1.0, with seed 20261124 plus the sample index.
-- Accepts a reply only if it is a bare number, optionally followed by `%` and a full stop (for example `70`, `70%`, `72.5`, `70.`), and the number lies between 0 and 100 (D19). Replies such as `## Step 1: ...`, `70-80` or `about 70` are invalid.
-- If a reply is invalid, it asks the same prompt again in the same conversation, up to 2 times. After that the answer is recorded as missing.
-- Stores Ollama's `done_reason` for the final attempt. `length` means the reply hit the 64-token cap. Files written before this column existed get it added on their next use, empty for the old rows (D18).
-- Writes to `data/llm_answers/answers.csv`. This file is generated by us, so it may be committed.
-
-**Install**
-1. Install Ollama from https://ollama.com/download, or on macOS run `brew install ollama`.
-2. Start the server with `ollama serve`, or open the Ollama app. It listens on `http://localhost:11434`.
-3. Pull the models listed in `experiments/words/models.yaml` (about 20 GB of disk in total):
-   ```
-   ollama pull llama3.1:8b
-   ollama pull qwen2.5:7b
-   ollama pull gemma2:9b
-   ollama pull mistral:7b
-   ```
-4. Install the Python dependency with `.venv/bin/pip install -r requirements.txt`. This adds PyYAML.
-
-**Run**
-```
-.venv/bin/python -I experiments/words/elicit_llm.py --dry-run              # fake model, writes data/processed/llm_answers_dryrun.csv
-.venv/bin/python -I experiments/words/elicit_llm.py --models llama3.1:8b --samples 2 --out /tmp/smoke.csv   # smoke test
-.venv/bin/python -I experiments/words/elicit_llm.py                        # full run
+```mermaid
+flowchart LR
+    R["Survey respondents<br/>(CAPphrase)"] --> EC["Encoder<br/>group quantile trapezoids<br/>→ IT2 envelope"]
+    L["Four local LLMs<br/>(repeated answers)"] --> EL["Encoder<br/>model quantile trapezoids<br/>→ IT2 envelope"]
+    EC --> CB["Codebooks<br/>citizen / LLM"]
+    EL --> CB
+    M["Crisis degree m<br/>(0–100)"] --> V["CWW engine<br/>verbaliser: m → crisis word"]
+    CB --> V
+    V --> D["Decoder<br/>rule table"]
+    RW["Reply word<br/>(5-point appropriateness)"] --> D
+    D --> A["Action A0–A3<br/>continue · helpline · counsellor · urgent"]
 ```
 
-**Resuming and model versions**
-- The run is resumable: rows already in the CSV are skipped. If the run stops, rerun the same command.
-- Each tag's digest is read from `/api/tags` and stored on every row.
-- The script refuses to append answers for a tag whose digest has changed. Don't run `ollama pull` again in the middle of a study.
+1. **Encoder:** each respondent group's (or model's) answers for a word become a quantile trapezoid; the envelope over
+   groups (or models) is the interval type-2 word model ([docs/METHOD.md](docs/METHOD.md), `src/cww/quantile.py`).
+2. **Codebooks:** the citizen codebook comes from respondents, the LLM codebook from the models; both use the same
+   encoder, so any difference is a difference in meaning.
+3. **CWW engine:** a crisis degree is put into one of four crisis words by largest membership (`src/cww/verbalise.py`).
+4. **Decoder:** the crisis word and a reply-quality word select an action A0–A3 from a rule table (`src/cww/rules.py`).
 
-**Answers collected before D19.** The first harness took the first number in a reply, so a verbose reply such as `## Step 1: ...` was stored as 1. Run this once on such a file:
-```
-.venv/bin/python -I experiments/words/elicit_llm.py --requeue-invalid
-```
-- It moves every accepted row whose stored reply fails the strict rule to `data/llm_answers/superseded.csv`. The row is copied unchanged and a `reason` column is added. That file is append-only.
-- It prints how many rows it moved per model, prompt and term.
-- A normal run afterwards requests exactly the moved rows again.
-- Rows that were already missing stay where they are. All their attempts failed the looser rule, so they also fail the strict one.
+## Data
 
-**Expected runtime.** The total has not been measured yet. Each answer is a few tokens, so a 7–9B model on an Apple-silicon laptop should take roughly 0.5–1.5 s per request. With re-asks, expect about 1–3 hours for all 7,600 answers. The script prints its progress and an ETA every 100 rows.
+| Dataset | Role | Licence | Citation / details |
+|---|---|---|---|
+| **CAPphrase** | Respondents' absolute and pairwise judgements of 19 probability phrases (RQ1, RQ2) | CC-BY 4.0 | Kucharski AJ (2026). *CAPphrase*, [doi:10.5281/zenodo.18750054](https://doi.org/10.5281/zenodo.18750054) (concept DOI; v1.0.0: [10.5281/zenodo.18750055](https://doi.org/10.5281/zenodo.18750055)); [repository](https://github.com/adamkucharski/CAPphrase); [docs/DATA.md](docs/DATA.md#e-capphrase-wp1-data-only) |
+| **LLM answers** | Answers of four local models, 2 prompts (RQ2) | Generated by us; committed in [data/llm_answers/](data/llm_answers/) | [experiments/words/elicit_llm.py](experiments/words/elicit_llm.py), decisions D18/D19 |
+| **Between Help and Harm (BHH)** | Help-seeking messages from public mental-health datasets, with LLM crisis labels (RQ3) | No licence stated: used for research with citation, not redistributed, no text reproduced | Arnaiz-Rodriguez et al. (2026), [doi:10.2196/88435](https://doi.org/10.2196/88435); [docs/DATA.md](docs/DATA.md#a-between-help-and-harm) |
 
-## Word-meaning lab (WP6)
+Raw data are downloaded into `data/raw/` (git-ignored, read-only) and never edited; provenance and SHA-256 hashes are
+locked in [data/MANIFEST.json](data/MANIFEST.json).
 
-An interactive Streamlit prototype for the word-meaning study. It has two pages: *What does a word mean?*
-(citizen vs LLM word models) and a *Crisis-line simulator* (does the word mismatch flip the bot's action?). It
-reads only the committed aggregate results in `results/words/`.
+## Setup
+
+**Reference environment: Python 3.12** with the pins in [requirements.txt](requirements.txt).
 
 ```bash
-.venv/bin/streamlit run app/word_lab.py
+git clone https://github.com/Nikhil5hetty/mental-health-crisis.git
+cd mental-health-crisis
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-Reference environment: **Python 3.12** with the pins in `requirements.txt`.
+**Python 3.15 note:** `pyarrow==22.0.0` has no wheel for Python 3.15 and fails to build. On 3.15, install the packages
+without that pin (pyarrow 26 works with the pinned Streamlit; [app/README.md](app/README.md) lists the app-only
+subset):
 
-Installation manual, user manual and known limitations: [app/README.md](app/README.md). Usability
-self-evaluation: [docs/USABILITY.md](docs/USABILITY.md).
+```bash
+.venv/bin/python -m pip install streamlit==1.67.0 numpy pandas matplotlib PyYAML pytest requests openpyxl huggingface_hub
+```
+
+**Data for the word study.** Only CAPphrase and Between Help and Harm are needed; both come from public Git
+repositories, so no Hugging Face token is required:
+
+```bash
+.venv/bin/python -I scripts/fetch_data.py --only capphrase
+.venv/bin/python -I scripts/fetch_data.py --only between_help_and_harm
+.venv/bin/python -I scripts/verify_data.py
+```
+
+`fetch_data.py` downloads the pinned revisions recorded in `data/MANIFEST.json` and skips files that already match.
+`verify_data.py` checks every dataset in the manifest: the CAPphrase and BHH checks should pass, and it reports FAIL
+(exit code 1) for the earlier study's datasets (CounselBench, MentalAlign, MentalHealthBench) if you did not fetch
+them. Those are not needed here.
+
+## Reproduce
+
+Run from the repository root. Every script is offline and deterministic (fixed seeds); a rerun reproduces the
+committed files in `results/words/` byte for byte.
+
+1. **Data:** fetch and verify as in [Setup](#setup).
+2. **RQ1, citizen codebook** (also writes the descriptive respondent profile, D21):
+   ```bash
+   .venv/bin/python -I experiments/words/describe_respondents.py
+   .venv/bin/python -I experiments/words/run_rq1.py
+   ```
+3. **RQ2, LLM codebook:** the LLM answers are committed in `data/llm_answers/`, so no model is needed:
+   ```bash
+   .venv/bin/python -I experiments/words/run_rq2.py
+   ```
+4. **RQ3, decisions** (also reads the earlier study's committed `results/rq2/per_item.csv` for the reply words):
+   ```bash
+   .venv/bin/python -I experiments/words/run_rq3.py
+   ```
+5. **Tests:**
+   ```bash
+   .venv/bin/python -I -m pytest -q
+   ```
+6. **Paper** (every number is a macro generated from `results/`; see [paper/README.md](paper/README.md)):
+   ```bash
+   .venv/bin/python -I paper/scripts/export_numbers.py
+   .venv/bin/python -I paper/scripts/export_tables.py
+   .venv/bin/python -I paper/scripts/check_numbers.py
+   cd paper && make tectonic        # Tectonic (XeTeX); or: make pdf (latexmk, TeX Live) or upload paper/ to Overleaf
+   ```
+7. **App**, the word-meaning lab (two pages: word meanings and a crisis-line simulator):
+   ```bash
+   .venv/bin/streamlit run app/word_lab.py
+   ```
+   Installation manual, user manual and known limitations: [app/README.md](app/README.md).
+
+Steps 2–4 take well under a minute together on a laptop.
+
+### Optional: elicit the LLM answers again (Ollama)
+
+[experiments/words/elicit_llm.py](experiments/words/elicit_llm.py) asks local models what probability each phrase
+conveys (prompts P1 and P2, 50 samples per phrase at temperature 1.0, seed 20261124 plus the sample index). A reply is
+valid only if it is a bare number in [0, 100], optionally with `%` or a full stop (D19); otherwise the prompt is asked
+again in the same conversation, up to 2 times. The models and server are configured in
+[experiments/words/models.yaml](experiments/words/models.yaml): `llama3.1:8b`, `qwen2.5:7b`, `gemma2:9b`,
+`mistral:7b` on `http://localhost:11434`.
+
+1. Install [Ollama](https://ollama.com/download) (macOS: `brew install ollama`), start it with `ollama serve`, and pull
+   the models (about 20 GB): `ollama pull llama3.1:8b` and likewise for the other three.
+2. Try it without a model, then on one model:
+   ```bash
+   .venv/bin/python -I experiments/words/elicit_llm.py --dry-run          # fake model → data/processed/llm_answers_dryrun.csv
+   .venv/bin/python -I experiments/words/elicit_llm.py --models llama3.1:8b --samples 2 --out /tmp/smoke.csv
+   ```
+3. Full run: `.venv/bin/python -I experiments/words/elicit_llm.py`. It is resumable (existing rows are skipped), stores
+   each model's digest on every row, and refuses to mix digests for one tag, so do not `ollama pull` during a study.
+4. Answers collected under the earlier, looser parser can be moved to `data/llm_answers/superseded.csv` and requested
+   again with `--requeue-invalid` (D19). On the committed file this finds nothing to move.
 
 ## Repository structure
-```
+
+```text
 mental-health-crisis/
-├── README.md
-├── research/
-│   ├── PROJECT_PROPOSAL.md
-│   ├── LITERATURE_REVIEW.md
-│   ├── METHODOLOGY.md
-│   ├── REFERENCES.md
-│   └── VERILY_DATA_REQUEST.md
-├── experiments/
-│   └── option_a/
-│       ├── README.md
-│       └── reproduce_bhh_agreement.py
+├── app/                    word-meaning lab (Streamlit): word_lab.py, views/, README.md
 ├── data/
-│   └── README.md
+│   ├── MANIFEST.json       provenance and SHA-256 lock of all downloaded files
+│   ├── llm_answers/        LLM answers generated by us (answers.csv, superseded.csv)
+│   └── raw/                downloaded data, git-ignored, read-only
+├── docs/                   analysis plans, DECISIONS.md, METHOD.md, DATA.md, AI_USAGE.md, USABILITY.md
+├── experiments/words/      word study: elicit_llm.py, run_rq1.py, run_rq2.py, run_rq3.py, describe_respondents.py
+├── paper/                  seminar paper (acmart): sections/, scripts/, generated/, Makefile
+├── results/words/          rq1/, rq2/, rq3/: SUMMARY.md, metrics, codebooks, figures
+├── scripts/                fetch_data.py, verify_data.py
 ├── src/
-├── notebooks/
-└── results/
+│   ├── app/                app logic (unit-tested)
+│   ├── cww/                Computing with Words core: sets, centroid, similarity, quantile, verbalise, rules
+│   └── data/               read-only loaders (capphrase.py, bhh.py, ...)
+└── tests/                  synthetic tests for loaders, CWW core, experiments, app and paper
 ```
 
-## Key references
-- [Nelson, B. W. et al. (2026). *An AI-based mental health guardrail and dataset for identifying psychiatric crises in text-based conversations*. npj Digital Medicine, 9, 407.](https://doi.org/10.1038/s41746-026-02579-5)
-- [Arnaiz-Rodriguez, A. et al. (2026). *Between Help and Harm: An Evaluation Study of Mental Health Crisis Handling by Large Language Models*. JMIR Mental Health, 13, e88435.](https://doi.org/10.2196/88435)
-- [Ghosh, S. et al. (2025). *AEGIS2.0: A Diverse AI Safety Dataset and Risks Taxonomy for Alignment of LLM Guardrails*. NAACL 2025.](https://aclanthology.org/2025.naacl-long.306/)
-- [Weilnhammer, V. et al. (2026). *A clinically validated framework for auditing AI chatbot behavior in mental health interactions*. Nature Medicine.](https://doi.org/10.1038/s41591-026-04577-2)
+**Earlier exploratory study** (kept because the paper cites it): `experiments/rq1/`, `experiments/rq2/`,
+`experiments/counselbench/`, `experiments/demo/`, `experiments/common.py`, `results/rq1/`, `results/rq2/`,
+`results/counselbench/`, `results/demo/`, `docs/ANALYSIS_PLAN_RQ2.md`, `docs/ANALYSIS_PLAN_RQ1_DEMO.md`.
 
-## Research ethics
-This repository is for model-safety research. Crisis examples should be handled as research data, not clinical advice or diagnostic outputs. Any new dataset involving human annotators, clinicians, or sensitive real-world conversations should follow the university's ethics and privacy requirements.
+## Pre-registration and decisions
+
+- **Plan:** [docs/ANALYSIS_PLAN_WORDS.md](docs/ANALYSIS_PLAN_WORDS.md), frozen in the repository before the data were
+  fetched or elicited (internal, commit-timestamped pre-registration; not a public registry).
+- **Decisions and deviations:** [docs/DECISIONS.md](docs/DECISIONS.md) (D17–D21 concern this study); each results
+  SUMMARY.md has a Deviations section.
+- **Method:** [docs/METHOD.md](docs/METHOD.md) for the CWW core.
+- **Data provenance and verification:** [docs/DATA.md](docs/DATA.md), [docs/DATA_VERIFICATION.txt](docs/DATA_VERIFICATION.txt).
+- **Use of AI tools:** [docs/AI_USAGE.md](docs/AI_USAGE.md).
+- **Repository conventions:** [AGENTS.md](AGENTS.md).
+
+## Earlier exploratory study
+
+An earlier CWW study on expert disagreement in crisis-safety judgements (Between Help and Harm, CounselBench)
+motivates this work. Its plans and results are in [docs/ANALYSIS_PLAN_RQ2.md](docs/ANALYSIS_PLAN_RQ2.md),
+[docs/ANALYSIS_PLAN_RQ1_DEMO.md](docs/ANALYSIS_PLAN_RQ1_DEMO.md) and [results/rq1](results/rq1),
+[rq2](results/rq2), [demo](results/demo) and [counselbench](results/counselbench).
+
+## Ethics and licences
+
+- We collected no data from people. The study uses published data (CAPphrase, CC-BY 4.0; Between Help and Harm,
+  research use with citation, not redistributed) and answers generated by local models.
+- Only aggregate results are committed; no survey record and no message text is reproduced.
+- Context: Swiss helplines are **143** (Die Dargebotene Hand), **147** (Pro Juventute, for young people), and the
+  emergency numbers **144** (ambulance) and **112** (European emergency number). If you or someone you know is in
+  crisis, contact them, not this software.
+
+## Known issues
+
+- `pytest` shows two failures that depend on the environment, not on the word study:
+  - `tests/test_integration.py::test_build_processed_references` needs every dataset of the earlier study under
+    `data/raw/` (CounselBench, MentalAlign, MentalHealthBench).
+  - `tests/test_loaders.py::test_answer_artefacts_parquet_roundtrip` fails with pandas 3.x (a missing value is read
+    back as NaN, not None); it passes with the pinned pandas 2.3.3.
+- `scripts/verify_data.py` exits with code 1 if the earlier study's datasets were not fetched (see [Setup](#setup)).
+
+## How to cite
+
+```bibtex
+@misc{shetty2026sameword,
+  author = {Shetty, Nikhil and Rao, Rajeshwar},
+  title  = {Same Word, Different Meaning: Respondent vs {LLM} Word Models for Crisis-Line Risk Communication},
+  year   = {2026},
+  note   = {Seminar paper, Seminar Urban Computing HS2026, Human-IST Institute, University of Fribourg (BeNeFri).
+            Code and data: https://github.com/Nikhil5hetty/mental-health-crisis}
+}
+```
+
+Please also cite the datasets: CAPphrase (Kucharski 2026) and Between Help and Harm (Arnaiz-Rodriguez et al. 2026).
