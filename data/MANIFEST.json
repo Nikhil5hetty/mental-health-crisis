@@ -71,6 +71,14 @@
       "revision_note": "No Git/HF revision published; archive pinned by SHA-256",
       "download_date_utc": "2026-11-21T15:57:54Z",
       "licence": "MIT"
+    },
+    "capphrase": {
+      "type": "git",
+      "url": "https://github.com/adamkucharski/CAPphrase",
+      "revision": "f12d35545011d83cee3803ebf21be675c9d254da",
+      "download_date_utc": "2026-11-24T11:39:15Z",
+      "licence": "CC-BY-4.0",
+      "lfs_pointers_resolved": []
     }
   },
   "datasets": {
@@ -84,6 +92,9 @@
       "status": "fetched"
     },
     "mentalhealthbench": {
+      "status": "fetched"
+    },
+    "capphrase": {
       "status": "fetched"
     }
   },
@@ -4410,6 +4421,39 @@
       "size": 308,
       "sha256": "ec00e1e3f73c3bab45199bca8f897b8c2162dcb06404a5588afd03f26394afbd",
       "licence": "Not specified in source repository"
+    },
+    {
+      "path": "data/raw/capphrase/absolute_judgements.csv",
+      "dataset": "capphrase",
+      "source": "capphrase",
+      "source_url": "https://github.com/adamkucharski/CAPphrase/blob/f12d35545011d83cee3803ebf21be675c9d254da/data/absolute_judgements.csv",
+      "revision": "f12d35545011d83cee3803ebf21be675c9d254da",
+      "download_date_utc": "2026-11-24T11:39:15Z",
+      "size": 2350397,
+      "sha256": "b56b7b380ae5d8743cfdddee0fd0ec08370940d163a574d916d3f555a68a3dfb",
+      "licence": "CC-BY-4.0"
+    },
+    {
+      "path": "data/raw/capphrase/pairwise_comparisons.csv",
+      "dataset": "capphrase",
+      "source": "capphrase",
+      "source_url": "https://github.com/adamkucharski/CAPphrase/blob/f12d35545011d83cee3803ebf21be675c9d254da/data/pairwise_comparisons.csv",
+      "revision": "f12d35545011d83cee3803ebf21be675c9d254da",
+      "download_date_utc": "2026-11-24T11:39:15Z",
+      "size": 2479910,
+      "sha256": "32e0387bc3f39a66ceef9b3e22213a3c30597df4b000af2505dd2cf9ad27d81a",
+      "licence": "CC-BY-4.0"
+    },
+    {
+      "path": "data/raw/capphrase/respondent_metadata.csv",
+      "dataset": "capphrase",
+      "source": "capphrase",
+      "source_url": "https://github.com/adamkucharski/CAPphrase/blob/f12d35545011d83cee3803ebf21be675c9d254da/data/respondent_metadata.csv",
+      "revision": "f12d35545011d83cee3803ebf21be675c9d254da",
+      "download_date_utc": "2026-11-24T11:39:15Z",
+      "size": 366364,
+      "sha256": "af44b73e2a18501b96ecd2babc12a019be97e33a838e4f87866282a2cf7fc835",
+      "licence": "CC-BY-4.0"
     },
     {
       "path": "data/raw/counselbench/CounselBench-Adv-human-annotation/.gitattributes",

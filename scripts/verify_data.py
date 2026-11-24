@@ -66,7 +66,7 @@ def verify_manifest(r, root):
     actual = {p.relative_to(root).as_posix() for p in (root / "data/raw").rglob("*") if p.is_file()}
     r.check("raw files missing from manifest", sorted(actual - recorded), [])
     r.check("manifest files missing on disk", sorted(recorded - actual), [])
-    for dataset in ("between_help_and_harm", "counselbench", "mentalalign", "mentalhealthbench"):
+    for dataset in ("between_help_and_harm", "counselbench", "mentalalign", "mentalhealthbench", "capphrase"):
         entries = [e for e in manifest["files"] if e["dataset"] == dataset]
         r.check(f"{dataset} fetch status", manifest["datasets"].get(dataset, {}).get("status"), "fetched")
         r.check(f"{dataset} manifest has files", bool(entries), True)
@@ -275,6 +275,41 @@ def verify_mentalhealthbench(r, raw):
               sum(m["role"] == "assistant" for row in rows for m in row["conversation"]["messages"]))
 
 
+def verify_capphrase(r, raw):
+    # Import only trusted project code, including when the CLI runs with -I.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from src.data import capphrase
+    root = raw / "capphrase"
+    judgements = capphrase.load_judgements(root)
+    pairs = capphrase.load_pairs(root)
+    respondents = capphrase.load_respondents(root)
+    r.check("CAPphrase judgement rows", len(judgements), 98306)
+    r.check("CAPphrase respondents", len(respondents), 5174)
+    r.check("CAPphrase terms", judgements.term.nunique(), 19)
+    r.check("CAPphrase pair rows", len(pairs), 51740)
+    ids = set(respondents.response_id)
+    r.check("CAPphrase judgement respondent coverage", set(judgements.response_id) == ids, True)
+    r.check("CAPphrase pair respondent coverage", set(pairs.response_id) == ids, True)
+    terms = set(judgements.term)
+    groups = judgements.groupby('response_id', sort=False)
+    r.check("CAPphrase respondents without exactly all 19 terms",
+            sum(len(g) != 19 or set(g.term) != terms for _, g in groups), 0)
+    r.check("CAPphrase duplicate respondent/term rows",
+            int(judgements.duplicated(['response_id', 'term']).sum()), 0)
+    r.check("CAPphrase probabilities outside 0–100 or missing",
+            int((~judgements.probability.between(0, 100)).sum()), 0)
+    r.check("CAPphrase presentation order not a permutation of 1–19",
+            sum(set(g['order']) != set(range(1, 20)) for _, g in groups), 0)
+    r.check("CAPphrase pair counts per respondent", dict(Counter(pairs.groupby('response_id').size())), {10: 5174})
+    r.check("CAPphrase pair selections outside presented terms",
+            int((~(pairs.selected.eq(pairs.term1) | pairs.selected.eq(pairs.term2))).sum()), 0)
+    r.observe("CAPphrase english_group counts (respondents)", respondents.english_group.value_counts().sort_index().to_dict())
+    r.observe("CAPphrase age_group counts (respondents)", respondents.age_group.value_counts().sort_index().to_dict())
+    r.observe("CAPphrase probability medians per term (unfiltered verification summary)",
+              judgements.groupby('term').probability.median().sort_index().to_dict())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT, help="Repository root (also useful for isolated fixture checks)")
@@ -284,7 +319,7 @@ def main():
     print("PASS (observed) reports measurements without a fixed expected value; FAIL never modifies files.\n")
     r.run("manifest integrity", verify_manifest, r, args.root)
     for name, function in [("CounselBench", verify_counselbench), ("Between Help and Harm", verify_between_help_and_harm),
-                           ("MentalAlign", verify_mentalalign), ("MentalHealthBench", verify_mentalhealthbench)]:
+                           ("MentalAlign", verify_mentalalign), ("MentalHealthBench", verify_mentalhealthbench), ("CAPphrase", verify_capphrase)]:
         print(f"\n{name}")
         r.run(name, function, r, args.root / "data/raw")
     print(f"\nVerification summary: PASS={r.passed}, FAIL={r.failed}")
