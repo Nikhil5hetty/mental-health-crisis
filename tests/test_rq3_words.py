@@ -161,6 +161,37 @@ def test_end_to_end_byte_identical(tmp_path):
         hashes.append(digest(tmp_path / name))
     assert hashes[0] == hashes[1]
     assert {'per_item.csv', 'metrics.csv', 'flip_matrix.csv', 'SUMMARY.md', 'figures/flip_matrix.png',
-            'figures/flip_rates.png', 'figures/level_words.png'} <= set(hashes[0])
+            'figures/flip_rates.png', 'figures/level_words.png', 'sensitivity_posthoc.csv'} <= set(hashes[0])
     text = (tmp_path / 'a' / 'SUMMARY.md').read_text()
     assert '## Deviations' in text and 'All-zero fallback' in text and '## H3' in text
+
+
+# --------------------------------------------------------------------------- post-hoc sensitivity
+
+def test_neighbour_fallback_picks_more_severe_neighbour():
+    assert max(r.memberships(25, LLM).values()) == 0
+    assert r.verbalise(25, LLM, fallback='neighbour') == ('Possible', True)   # None left, Possible right
+    edge = {'None': t1(5, 6, 10, 15), 'Possible': t1(40, 50, 60, 65), 'Likely': t1(60, 65, 80, 90), 'Clear': t1(85, 90, 95, 98)}
+    assert r.verbalise(0, edge, fallback='neighbour') == ('None', True)        # only a right neighbour
+    assert r.verbalise(100, edge, fallback='neighbour') == ('Clear', True)     # only a left neighbour
+    assert r.verbalise(5, LLM, fallback='neighbour') == ('None', False)        # no fallback needed
+    with pytest.raises(ValueError):
+        r.verbalise(25, LLM, fallback='other')
+
+
+def test_posthoc_counts_only_clean_flips_and_alternative_fallback():
+    data = items([0, 25, 58])
+    data['reply_word'] = ['Mostly Appropriate', 'Mostly Appropriate', 'Partially Appropriate']
+    table = r.per_item(data, books())
+    # item 1 flips only through the LLM fallback; item 2 flips with both words chosen by max membership
+    assert table.fallback_llm.tolist() == [0, 1, 0]
+    assert (table.action_citizen != table.action_llm).tolist() == [False, True, True]
+    post, alt = r.posthoc_table(table, books(), b=20)
+    get = lambda a, m: post[(post.analysis == a) & (post.metric == m) & (post.comparison == 'llm_vs_citizen')].estimate.iloc[0]
+    assert get(r.POSTHOC_NO_FALLBACK, 'action_flip_rate') == 1 / 3
+    assert get(r.POSTHOC_NO_FALLBACK, 'share_items_no_fallback') == 2 / 3
+    assert get(r.POSTHOC_NO_FALLBACK, 'action_flip_rate_among_no_fallback_items') == 1 / 2
+    assert alt[r.LLM][0].tolist() == ['None', 'Possible', 'Possible']        # m = 25 -> more severe neighbour
+    assert get(r.POSTHOC_NEIGHBOUR, 'action_flip_rate') == 1 / 3
+    assert get(r.POSTHOC_NEIGHBOUR, 'under_escalation_rate') == 1 / 3
+    assert set(post.comparison) == {'llm_vs_citizen', 'llm_vs_native|18-34'}

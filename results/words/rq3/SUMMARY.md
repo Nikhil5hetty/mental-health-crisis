@@ -57,14 +57,35 @@ Actions: A0 = Continue; A1 = Signpost helpline (143; 147 for young people); A2 =
 
 `*` = all four memberships were 0; nearest-centre fallback used.
 
+## Post-hoc sensitivity (added after PM review; not in the frozen plan)
+
+Labelled post-hoc: chosen after seeing the primary result, to show how much H3 depends on the all-zero fallback. Same 190 items and the same bootstrap draws as the primary analysis. Values for every comparison: `sensitivity_posthoc.csv`.
+
+- (a) Only items decided without a fallback on both sides count as flips (denominator: all items).
+- (b) Alternative fallback: the more severe of the two words neighbouring m (left: support ends closest below m; right: support starts closest above m; at an end of the scale the single neighbour). Applied to every codebook.
+
+| LLM vs citizen IT2 | Action flip | Under-escalation | Over-escalation |
+|---|---|---|---|
+| Primary (nearest-centre fallback) | 0.047 [0.021, 0.079] | 0.037 [0.016, 0.068] | 0.011 [0.000, 0.026] |
+| (a) No-fallback items only | 0.026 [0.005, 0.053] | 0.016 [0.000, 0.032] | 0.011 [0.000, 0.026] |
+| (b) More severe neighbour fallback | 0.026 [0.005, 0.053] | 0.016 [0.000, 0.032] | 0.011 [0.000, 0.026] |
+
+(a) 5 of 190 items flip without any fallback; these come from 19 no-fallback items (share 0.100 [0.063, 0.147]; flip rate among them 0.263 [0.077, 0.467]). (b) 5 of 190 items flip. H3 rule applied descriptively: (a) supported, (b) supported.
+
+Gap finding: crisis degrees covered by a citizen word but by no LLM word: m = 22.2 (1 item): citizen "Remote Chance", LLM has no word (fallback "Remote Chance"); m = 28.6 (1 item): citizen "Realistic Possibility", LLM has no word (fallback "Remote Chance"); m = 33.3 (9 items): citizen "Realistic Possibility", LLM has no word (fallback "Remote Chance"); m = 88.9 (6 items): citizen "Almost Certain", LLM has no word (fallback "Almost Certain").
+
+## Note for the paper
+
+All 9 flips (LLM vs citizen IT2) are between A0 and A1: on this dataset the word mismatch changes whether a helpline is suggested, never whether a human is involved (A2/A3). Under the post-hoc fallback (b) the flips are between A0/A1.
+
 ## Deviations
 
-- All-zero fallback (brief: count and report). Items whose m has membership 0 in all four level words, verbalised by the nearest EKM centroid centre (ties to the more severe word): citizen 154 items (2 distinct m); llm 171 items (6 distinct m); native / 18-34 160 items (3 distinct m); native / 35-54 154 items (2 distinct m); native / 55+ 154 items (2 distinct m); non_native / 18-34 154 items (2 distinct m); non_native / 35-54 154 items (2 distinct m); non_native / 55+ 154 items (2 distinct m). In every codebook "Remote Chance" has membership 0 at m = 0 and "Almost Certain" has membership 0 at m = 100 (the quantile trapezoids rise from q05 and fall to q95 inside 0..100); intermediate m values can fall in gaps between level words (e.g. the LLM codebook between "Remote Chance" and "Realistic Possibility"). The fallback therefore decides many verbalisations, including flips (count in the H3 section).
+- All-zero fallback (brief: count and report). Items whose m has membership 0 in all four level words, verbalised by the nearest EKM centroid centre (ties to the more severe word): citizen 154 items (2 distinct m); llm 171 items (6 distinct m); native / 18-34 160 items (3 distinct m); native / 35-54 154 items (2 distinct m); native / 55+ 154 items (2 distinct m); non_native / 18-34 154 items (2 distinct m); non_native / 35-54 154 items (2 distinct m); non_native / 55+ 154 items (2 distinct m). In every codebook "Remote Chance" has membership 0 at m = 0 and "Almost Certain" has membership 0 at m = 100 (the quantile trapezoids rise from q05 and fall to q95 inside 0..100); intermediate m values can fall in gaps between level words (e.g. the LLM codebook between "Remote Chance" and "Realistic Possibility"). The fallback therefore decides many verbalisations, including flips (count in the H3 section). PM ruling (WP5 review): the nearest-centre fallback stays the primary rule; at m = 0 / 100 it is harmless because all codebooks agree, and an LLM gap is itself a finding. Post-hoc sensitivities are in their own section.
 - The LLM codebook is the primary-prompt (P1) LLM IT2 from RQ2; P2 is not analysed for RQ3.
 - Under- and over-escalation are reported for every comparison; over-escalation (LLM action > reference action) is not in the plan and is descriptive. Group comparisons are descriptive; H3 uses the citizen IT2 comparison only.
 - Max-membership ties go to the more severe word (plan); the rule-table action is computed with rules.infer at membership 1 and checked against the table for every item.
 - Verdict wording: "supported" only if the CI lower bound of the flip rate is above 0 (exploratory, no multiplicity correction).
 
-Files: `per_item.csv` (item ids, m, reply word, and per codebook the level, CAPphrase word, fallback flag and action; read with `keep_default_na=False`, since "None" is a level name), `metrics.csv`, `flip_matrix.csv` (all comparisons), `figures/`.
+Files: `per_item.csv` (item ids, m, reply word, and per codebook the level, CAPphrase word, fallback flag and action; read with `keep_default_na=False`, since "None" is a level name), `metrics.csv`, `flip_matrix.csv` (all comparisons), `sensitivity_posthoc.csv` (post-hoc), `figures/`. `results/words/rq2/codebooks/llm_it2.csv` holds P1 and P2 rows: filter on `prompt` when reusing it.
 
 Software: numpy 2.5.5, pandas 3.1.1, matplotlib 3.11.2. CSV floats: 17 significant digits.

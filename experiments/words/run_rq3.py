@@ -104,12 +104,47 @@ def memberships(m, book):
     return out
 
 
-def verbalise(m, book, centres=None):
-    """(level, fallback used). Max membership, ties to the more severe level; all-zero -> nearest centre."""
+def more_severe(levels):
+    return max(levels, key=SEVERITY.index)
+
+
+def neighbour_fallback(m, book):
+    """POST-HOC alternative fallback: the more severe of the two words neighbouring m.
+
+    Support of a word = grid points with (UMF + LMF) / 2 > 0. Left neighbour = word whose support ends
+    closest below m; right neighbour = word whose support starts closest above m (ties: more severe).
+    At an end of the scale only one neighbour exists and is chosen.
+    """
+    left, right = {}, {}
+    for level, s in book.items():
+        x = s.x[(s.umf + s.lmf) / 2 > 0]
+        if x.size == 0:
+            raise ValueError(f'Level word {level!r} has empty support')
+        if x[-1] < m:
+            left[level] = x[-1]
+        elif x[0] > m:
+            right[level] = x[0]
+        else:
+            raise ValueError(f'm = {m} lies inside the support of {level!r}; no fallback needed')
+    picks = []
+    if left:
+        best = max(left.values()); picks.append(more_severe([l for l, v in left.items() if v == best]))
+    if right:
+        best = min(right.values()); picks.append(more_severe([l for l, v in right.items() if v == best]))
+    return more_severe(picks)
+
+
+def verbalise(m, book, centres=None, fallback='centre'):
+    """(level, fallback used). Max membership, ties to the more severe level; all-zero -> nearest centre
+    (primary) or, for the post-hoc sensitivity, fallback='neighbour' (more severe neighbouring word)."""
     mu = memberships(m, book)
     best = max(mu.values())
     if best > 0:
         return max((l for l in SEVERITY if mu[l] == best), key=SEVERITY.index), False
+    if fallback == 'neighbour':
+        return neighbour_fallback(m, book), True
+    if fallback != 'centre':
+        raise ValueError(f'Unknown fallback {fallback!r}')
     centres = centres or {l: centre(book[l]) for l in SEVERITY}
     dist = {l: abs(centres[l] - m) for l in SEVERITY}
     nearest = min(dist.values())
@@ -188,6 +223,65 @@ def flip_matrix(table, books):
     return pd.DataFrame(rows)
 
 
+POSTHOC_NO_FALLBACK = 'a_no_fallback_items_only'
+POSTHOC_NEIGHBOUR = 'b_severe_neighbour_fallback'
+
+
+def neighbour_levels(table, books):
+    """Per codebook: levels and actions with the post-hoc 'more severe neighbour' fallback."""
+    out = {}
+    for name, book in books.items():
+        levels = np.array([verbalise(m, book, fallback='neighbour')[0] for m in table.m])
+        actions = np.array([action(l, w) for l, w in zip(levels, table.reply_word)])
+        out[name] = (levels, actions)
+    return out
+
+
+def posthoc_table(table, books, b=B, seed=SEED):
+    """POST-HOC sensitivity (PM review of WP5), same bootstrap draws as the primary metrics.
+
+    (a) flips counted only on items where neither codebook used the all-zero fallback; the rate keeps all items
+        in the denominator (plus the share of such items and the rate among them).
+    (b) primary metrics recomputed with the alternative 'more severe neighbouring word' fallback.
+    """
+    idx = bootstrap_indices(len(table), b, seed)
+    alt = neighbour_levels(table, books)
+    llm_action = table[f'action_{LLM}'].to_numpy()
+    llm_fb = table[f'fallback_{LLM}'].to_numpy() == 1
+    rows = []
+
+    def add(analysis, metric, label, fn, conditional=False):
+        point = fn(np.arange(len(table)))
+        values = np.array([fn(i) for i in idx], dtype=float)
+        undefined = int((~np.isfinite(values)).sum())
+        if undefined and not conditional:
+            raise ValueError(f'Undefined bootstrap value for {analysis}/{metric}/{label}')
+        if undefined == len(values) or not np.isfinite(point):
+            raise ValueError(f'No defined value for {analysis}/{metric}/{label}')
+        # A conditional rate is undefined in a replicate without no-fallback items; its CI uses the others.
+        lo, hi = np.percentile(values[np.isfinite(values)], [2.5, 97.5], method='linear')
+        rows.append(dict(analysis=analysis, metric=metric, comparison=f'llm_vs_{label}', estimate=float(point),
+                         ci_lo=float(lo), ci_hi=float(hi), n_items=len(table), n_boot_undefined=undefined))
+
+    for label, ref in comparisons(books):
+        tag = column_tag(ref)
+        ref_action = table[f'action_{tag}'].to_numpy()
+        clean = ~(llm_fb | (table[f'fallback_{tag}'].to_numpy() == 1))
+        flip = ref_action != llm_action
+        add(POSTHOC_NO_FALLBACK, 'action_flip_rate', label, lambda i: np.mean(flip[i] & clean[i]))
+        add(POSTHOC_NO_FALLBACK, 'under_escalation_rate', label, lambda i: np.mean((llm_action[i] < ref_action[i]) & clean[i]))
+        add(POSTHOC_NO_FALLBACK, 'over_escalation_rate', label, lambda i: np.mean((llm_action[i] > ref_action[i]) & clean[i]))
+        add(POSTHOC_NO_FALLBACK, 'share_items_no_fallback', label, lambda i: np.mean(clean[i]))
+        add(POSTHOC_NO_FALLBACK, 'action_flip_rate_among_no_fallback_items', label,
+            lambda i: np.sum(flip[i] & clean[i]) / np.sum(clean[i]) if np.sum(clean[i]) else np.nan, conditional=True)
+        r_level, r_action = alt[ref]
+        l_level, l_action = alt[LLM]
+        for metric in METRICS:
+            add(POSTHOC_NEIGHBOUR, metric, label,
+                lambda i, metric=metric: rates(r_level[i], l_level[i], r_action[i], l_action[i])[metric])
+    return pd.DataFrame(rows), alt
+
+
 def verdict_h3(ci_lo):
     return 'supported' if ci_lo > 0 else 'not supported'
 
@@ -257,11 +351,67 @@ def figures(table, books, metrics, flips, out):
     fig.tight_layout(); fig.savefig(out / 'flip_rates.png', dpi=150, metadata={'Software': None}); plt.close(fig)
 
 
+def posthoc_section(table, books, metrics, posthoc, alt):
+    """SUMMARY section for the post-hoc sensitivities and the generated paper notes."""
+    comp = f'llm_vs_{CITIZEN}'
+
+    def ph(analysis, metric):
+        return posthoc[(posthoc.analysis == analysis) & (posthoc.metric == metric) & (posthoc.comparison == comp)].iloc[0]
+
+    def pm(metric):
+        return metrics[(metrics.metric == metric) & (metrics.comparison == comp)].iloc[0]
+
+    cit, llm = table[f'action_{CITIZEN}'].to_numpy(), table[f'action_{LLM}'].to_numpy()
+    clean = ~((table[f'fallback_{CITIZEN}'] == 1) | (table[f'fallback_{LLM}'] == 1)).to_numpy()
+    n_clean_flip = int(((cit != llm) & clean).sum())
+    alt_cit, alt_llm = alt[CITIZEN][1], alt[LLM][1]
+    lines = ['## Post-hoc sensitivity (added after PM review; not in the frozen plan)', '',
+             'Labelled post-hoc: chosen after seeing the primary result, to show how much H3 depends on the all-zero fallback. '
+             f'Same {len(table)} items and the same bootstrap draws as the primary analysis. Values for every comparison: '
+             '`sensitivity_posthoc.csv`.', '',
+             '- (a) Only items decided without a fallback on both sides count as flips (denominator: all items).',
+             '- (b) Alternative fallback: the more severe of the two words neighbouring m (left: support ends closest below m; '
+             'right: support starts closest above m; at an end of the scale the single neighbour). Applied to every codebook.', '',
+             '| LLM vs citizen IT2 | Action flip | Under-escalation | Over-escalation |', '|---|---|---|---|',
+             f'| Primary (nearest-centre fallback) | {fmt(pm("action_flip_rate"))} | {fmt(pm("under_escalation_rate"))} | '
+             f'{fmt(pm("over_escalation_rate"))} |',
+             f'| (a) No-fallback items only | {fmt(ph(POSTHOC_NO_FALLBACK, "action_flip_rate"))} | '
+             f'{fmt(ph(POSTHOC_NO_FALLBACK, "under_escalation_rate"))} | {fmt(ph(POSTHOC_NO_FALLBACK, "over_escalation_rate"))} |',
+             f'| (b) More severe neighbour fallback | {fmt(ph(POSTHOC_NEIGHBOUR, "action_flip_rate"))} | '
+             f'{fmt(ph(POSTHOC_NEIGHBOUR, "under_escalation_rate"))} | {fmt(ph(POSTHOC_NEIGHBOUR, "over_escalation_rate"))} |', '',
+             f'(a) {n_clean_flip} of {len(table)} items flip without any fallback; these come from '
+             f'{int(clean.sum())} no-fallback items (share {fmt(ph(POSTHOC_NO_FALLBACK, "share_items_no_fallback"))}; '
+             f'flip rate among them {fmt(ph(POSTHOC_NO_FALLBACK, "action_flip_rate_among_no_fallback_items"))}). '
+             f'(b) {int((alt_cit != alt_llm).sum())} of {len(table)} items flip. '
+             f'H3 rule applied descriptively: (a) {verdict_h3(ph(POSTHOC_NO_FALLBACK, "action_flip_rate").ci_lo)}, '
+             f'(b) {verdict_h3(ph(POSTHOC_NEIGHBOUR, "action_flip_rate").ci_lo)}.', '']
+    gap = table[(table[f'fallback_{LLM}'] == 1) & (table[f'fallback_{CITIZEN}'] == 0)]
+    if len(gap):
+        parts = []
+        for m, g in gap.groupby(gap.m.round(6), sort=True):
+            r = g.iloc[0]
+            parts.append(f'm = {m:.1f} ({len(g)} item{"s" if len(g) > 1 else ""}): citizen "{r[f"word_{CITIZEN}"]}", LLM has no word '
+                         f'(fallback "{r[f"word_{LLM}"]}")')
+        lines += ['Gap finding: crisis degrees covered by a citizen word but by no LLM word: ' + '; '.join(parts) + '.', '']
+    pairs = sorted({(int(a), int(c)) for a, c in zip(cit, llm) if a != c})
+    within = sorted({x for p in pairs for x in p})
+    lines += ['## Note for the paper', '']
+    if pairs and set(within) <= {0, 1}:
+        lines.append(f'All {int((cit != llm).sum())} flips (LLM vs citizen IT2) are between A0 and A1: on this dataset the word '
+                     'mismatch changes whether a helpline is suggested, never whether a human is involved (A2/A3). '
+                     f'Under the post-hoc fallback (b) the flips are between ' +
+                     ', '.join(sorted({f"A{min(a, c)}/A{max(a, c)}" for a, c in zip(alt_cit, alt_llm) if a != c})) + '.')
+    else:
+        lines.append('Flip pairs (citizen action, LLM action): ' + ', '.join(f'(A{a}, A{c})' for a, c in pairs) + '.')
+    lines.append('')
+    return lines
+
+
 def fmt(r):
     return f'{r.estimate:.3f} [{r.ci_lo:.3f}, {r.ci_hi:.3f}]'
 
 
-def summary(table, books, metrics, flips, b, versions):
+def summary(table, books, metrics, flips, b, versions, posthoc=None, alt=None):
     def get(metric, comparison):
         return metrics[(metrics.metric == metric) & (metrics.comparison == comparison)].iloc[0]
 
@@ -309,6 +459,8 @@ def summary(table, books, metrics, flips, b, versions):
         lines.append(f'| {m:.2f} | {len(g)} | ' + ' | '.join(cells) + ' |')
     lines += ['', '`*` = all four memberships were 0; nearest-centre fallback used.', '']
 
+    if posthoc is not None:
+        lines += posthoc_section(table, books, metrics, posthoc, alt)
     fallback = {n: int(table[f'fallback_{column_tag(n)}'].sum()) for n in names}
     distinct = {n: int(table.loc[table[f'fallback_{column_tag(n)}'] == 1, 'm'].round(6).nunique()) for n in names}
     lines += ['## Deviations', '',
@@ -318,7 +470,9 @@ def summary(table, books, metrics, flips, b, versions):
               'In every codebook "Remote Chance" has membership 0 at m = 0 and "Almost Certain" has membership 0 at m = 100 '
               '(the quantile trapezoids rise from q05 and fall to q95 inside 0..100); intermediate m values can fall in gaps '
               'between level words (e.g. the LLM codebook between "Remote Chance" and "Realistic Possibility"). '
-              'The fallback therefore decides many verbalisations, including flips (count in the H3 section).',
+              'The fallback therefore decides many verbalisations, including flips (count in the H3 section). '
+              'PM ruling (WP5 review): the nearest-centre fallback stays the primary rule; at m = 0 / 100 it is harmless '
+              'because all codebooks agree, and an LLM gap is itself a finding. Post-hoc sensitivities are in their own section.',
               f'- The LLM codebook is the primary-prompt ({LLM_PROMPT}) LLM IT2 from RQ2; P2 is not analysed for RQ3.',
               '- Under- and over-escalation are reported for every comparison; over-escalation (LLM action > reference action) '
               'is not in the plan and is descriptive. Group comparisons are descriptive; H3 uses the citizen IT2 comparison only.',
@@ -327,7 +481,8 @@ def summary(table, books, metrics, flips, b, versions):
               '- Verdict wording: "supported" only if the CI lower bound of the flip rate is above 0 (exploratory, no multiplicity correction).', '',
               'Files: `per_item.csv` (item ids, m, reply word, and per codebook the level, CAPphrase word, fallback flag and action; '
               'read with `keep_default_na=False`, since "None" is a level name), `metrics.csv`, `flip_matrix.csv` (all comparisons), '
-              '`figures/`.', '',
+              '`sensitivity_posthoc.csv` (post-hoc), `figures/`. `results/words/rq2/codebooks/llm_it2.csv` holds P1 and P2 rows: '
+              'filter on `prompt` when reusing it.', '',
               f'Software: numpy {versions["numpy"]}, pandas {versions["pandas"]}, matplotlib {versions["matplotlib"]}. '
               'CSV floats: 17 significant digits.', '']
     return '\n'.join(lines)
@@ -341,12 +496,14 @@ def run(items, books, out, b=B, seed=SEED, make_figures=True):
     write_csv(table, out / 'per_item.csv')
     write_csv(metrics, out / 'metrics.csv')
     write_csv(flips, out / 'flip_matrix.csv')
+    posthoc, alt = posthoc_table(table, books, b, seed)
+    write_csv(posthoc, out / 'sensitivity_posthoc.csv')
     import matplotlib
     versions = dict(numpy=np.__version__, pandas=pd.__version__, matplotlib=matplotlib.__version__)
     if make_figures:
         figdir = out / 'figures'; figdir.mkdir(exist_ok=True)
         figures(table, books, metrics, flips, figdir)
-    (out / 'SUMMARY.md').write_text(summary(table, books, metrics, flips, b, versions), encoding='utf-8')
+    (out / 'SUMMARY.md').write_text(summary(table, books, metrics, flips, b, versions, posthoc, alt), encoding='utf-8')
     return table, metrics, flips
 
 
