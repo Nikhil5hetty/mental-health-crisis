@@ -76,3 +76,18 @@ def load_judgements(root=None):
 def load_pairs(root=None):
     df = _read(root, 'pairwise_comparisons.csv', ['response_id','pair_id','term1','term2','selected'])
     return _groups(df, root)
+
+
+def exclude_inattentive(judgements):
+    """WP3 sensitivity only: drop respondents with Almost No Chance >= Almost Certain.
+
+    Requires one of each anchor per respondent, rejects missing anchors, and
+    returns a new table plus the respondent exclusion count. Other text and
+    values are untouched. The primary pooled/group samples never use this rule.
+    """
+    anchors = judgements[judgements.term.isin(['Almost No Chance', 'Almost Certain'])]
+    wide = anchors.pivot(index='response_id', columns='term', values='probability')
+    if set(wide.index) != set(judgements.response_id) or wide.isna().any().any():
+        raise ValueError('Inattention screening requires both anchors for every respondent')
+    excluded = wide.index[wide['Almost No Chance'] >= wide['Almost Certain']]
+    return judgements[~judgements.response_id.isin(excluded)].copy(), len(excluded)

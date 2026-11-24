@@ -1,0 +1,286 @@
+term,group_a,group_b,jaccard
+About Even,native|18-34,native|35-54,0.33333333333333331
+About Even,native|18-34,native|55+,0.40000000000000002
+About Even,native|18-34,non_native|18-34,0.21428571428571427
+About Even,native|18-34,non_native|35-54,0.625
+About Even,native|18-34,non_native|55+,0.35714285714285715
+About Even,native|35-54,native|55+,0.66666666666666663
+About Even,native|35-54,non_native|18-34,0.25
+About Even,native|35-54,non_native|35-54,0.375
+About Even,native|35-54,non_native|55+,0.21428571428571427
+About Even,native|55+,non_native|18-34,0.16666666666666666
+About Even,native|55+,non_native|35-54,0.25
+About Even,native|55+,non_native|55+,0.14285714285714285
+About Even,non_native|18-34,non_native|35-54,0.42857142857142855
+About Even,non_native|18-34,non_native|55+,0.8571428571428571
+About Even,non_native|35-54,non_native|55+,0.5714285714285714
+Almost Certain,native|18-34,native|35-54,1
+Almost Certain,native|18-34,native|55+,0.65909090909090906
+Almost Certain,native|18-34,non_native|18-34,0.79545454545454541
+Almost Certain,native|18-34,non_native|35-54,0.79545454545454541
+Almost Certain,native|18-34,non_native|55+,0.53703703703703709
+Almost Certain,native|35-54,native|55+,0.65909090909090906
+Almost Certain,native|35-54,non_native|18-34,0.79545454545454541
+Almost Certain,native|35-54,non_native|35-54,0.79545454545454541
+Almost Certain,native|35-54,non_native|55+,0.53703703703703709
+Almost Certain,native|55+,non_native|18-34,0.86363636363636365
+Almost Certain,native|55+,non_native|35-54,0.86363636363636365
+Almost Certain,native|55+,non_native|55+,0.79166666666666663
+Almost Certain,non_native|18-34,non_native|35-54,1
+Almost Certain,non_native|18-34,non_native|55+,0.70370370370370372
+Almost Certain,non_native|35-54,non_native|55+,0.70370370370370372
+Almost No Chance,native|18-34,native|35-54,1
+Almost No Chance,native|18-34,native|55+,1
+Almost No Chance,native|18-34,non_native|18-34,0.9642857142857143
+Almost No Chance,native|18-34,non_native|35-54,1
+Almost No Chance,native|18-34,non_native|55+,1
+Almost No Chance,native|35-54,native|55+,1
+Almost No Chance,native|35-54,non_native|18-34,0.9642857142857143
+Almost No Chance,native|35-54,non_native|35-54,1
+Almost No Chance,native|35-54,non_native|55+,1
+Almost No Chance,native|55+,non_native|18-34,0.9642857142857143
+Almost No Chance,native|55+,non_native|35-54,1
+Almost No Chance,native|55+,non_native|55+,1
+Almost No Chance,non_native|18-34,non_native|35-54,0.9642857142857143
+Almost No Chance,non_native|18-34,non_native|55+,0.9642857142857143
+Almost No Chance,non_native|35-54,non_native|55+,1
+Better than Even,native|18-34,native|35-54,0.9921355111917679
+Better than Even,native|18-34,native|55+,0.83333333333333337
+Better than Even,native|18-34,non_native|18-34,0.83333333333333337
+Better than Even,native|18-34,non_native|35-54,0.68965517241379315
+Better than Even,native|18-34,non_native|55+,0.83333333333333337
+Better than Even,native|35-54,native|55+,0.83993902439024781
+Better than Even,native|35-54,non_native|18-34,0.83993902439024781
+Better than Even,native|35-54,non_native|35-54,0.69512195121951548
+Better than Even,native|35-54,non_native|55+,0.83993902439024781
+Better than Even,native|55+,non_native|18-34,1
+Better than Even,native|55+,non_native|35-54,0.82758620689655171
+Better than Even,native|55+,non_native|55+,1
+Better than Even,non_native|18-34,non_native|35-54,0.82758620689655171
+Better than Even,non_native|18-34,non_native|55+,1
+Better than Even,non_native|35-54,non_native|55+,0.82758620689655171
+Chances are Slight,native|18-34,native|35-54,0.82222222222222219
+Chances are Slight,native|18-34,native|55+,0.69565217391304346
+Chances are Slight,native|18-34,non_native|18-34,0.81730769230769229
+Chances are Slight,native|18-34,non_native|35-54,0.84097633136094663
+Chances are Slight,native|18-34,non_native|55+,0.77777777777777779
+Chances are Slight,native|35-54,native|55+,0.84210526315789469
+Chances are Slight,native|35-54,non_native|18-34,0.66346153846153844
+Chances are Slight,native|35-54,non_native|35-54,0.68713017751479299
+Chances are Slight,native|35-54,non_native|55+,0.80000000000000004
+Chances are Slight,native|55+,non_native|18-34,0.55660377358490565
+Chances are Slight,native|55+,non_native|35-54,0.57982583454281578
+Chances are Slight,native|55+,non_native|55+,0.65853658536585369
+Chances are Slight,non_native|18-34,non_native|35-54,0.97573919636087958
+Chances are Slight,non_native|18-34,non_native|55+,0.70707070707070707
+Chances are Slight,non_native|35-54,non_native|55+,0.68991660348749062
+Could Happen,native|18-34,native|35-54,0.88235294117647056
+Could Happen,native|18-34,native|55+,0.84444444444444444
+Could Happen,native|18-34,non_native|18-34,0.90395480225988756
+Could Happen,native|18-34,non_native|35-54,0.98159509202453987
+Could Happen,native|18-34,non_native|55+,0.94117647058823528
+Could Happen,native|35-54,native|55+,0.93023255813953487
+Could Happen,native|35-54,non_native|18-34,0.80213903743315562
+Could Happen,native|35-54,non_native|35-54,0.86705202312138729
+Could Happen,native|35-54,non_native|55+,0.94117647058823528
+Could Happen,native|55+,non_native|18-34,0.77157360406091413
+Could Happen,native|55+,non_native|35-54,0.8306010928961749
+Could Happen,native|55+,non_native|55+,0.90000000000000002
+Could Happen,non_native|18-34,non_native|35-54,0.9209039548022605
+Could Happen,non_native|18-34,non_native|55+,0.85561497326203262
+Could Happen,non_native|35-54,non_native|55+,0.92485549132947975
+Highly Likely,native|18-34,native|35-54,1
+Highly Likely,native|18-34,native|55+,1
+Highly Likely,native|18-34,non_native|18-34,0.8571428571428571
+Highly Likely,native|18-34,non_native|35-54,0.83333333333333337
+Highly Likely,native|18-34,non_native|55+,0.78947368421052633
+Highly Likely,native|35-54,native|55+,1
+Highly Likely,native|35-54,non_native|18-34,0.8571428571428571
+Highly Likely,native|35-54,non_native|35-54,0.83333333333333337
+Highly Likely,native|35-54,non_native|55+,0.78947368421052633
+Highly Likely,native|55+,non_native|18-34,0.8571428571428571
+Highly Likely,native|55+,non_native|35-54,0.83333333333333337
+Highly Likely,native|55+,non_native|55+,0.78947368421052633
+Highly Likely,non_native|18-34,non_native|35-54,0.97222222222222221
+Highly Likely,non_native|18-34,non_native|55+,0.92105263157894735
+Highly Likely,non_native|35-54,non_native|55+,0.94736842105263153
+Highly Unlikely,native|18-34,native|35-54,0.90897984117288178
+Highly Unlikely,native|18-34,native|55+,0.91045606229143039
+Highly Unlikely,native|18-34,non_native|18-34,0.8162369720241397
+Highly Unlikely,native|18-34,non_native|35-54,0.8162369720241397
+Highly Unlikely,native|18-34,non_native|55+,0.84497444633731233
+Highly Unlikely,native|35-54,native|55+,0.82758620689655171
+Highly Unlikely,native|35-54,non_native|18-34,0.88888888888888884
+Highly Unlikely,native|35-54,non_native|35-54,0.88888888888888884
+Highly Unlikely,native|35-54,non_native|55+,0.92307692307692313
+Highly Unlikely,native|55+,non_native|18-34,0.75
+Highly Unlikely,native|55+,non_native|35-54,0.75
+Highly Unlikely,native|55+,non_native|55+,0.77419354838709675
+Highly Unlikely,non_native|18-34,non_native|35-54,1
+Highly Unlikely,non_native|18-34,non_native|55+,0.96296296296296291
+Highly Unlikely,non_native|35-54,non_native|55+,0.96296296296296291
+Improbable,native|18-34,native|35-54,1
+Improbable,native|18-34,native|55+,0.95918367346938771
+Improbable,native|18-34,non_native|18-34,0.88
+Improbable,native|18-34,non_native|35-54,0.83489795918367349
+Improbable,native|18-34,non_native|55+,0.84615384615384615
+Improbable,native|35-54,native|55+,0.95918367346938771
+Improbable,native|35-54,non_native|18-34,0.88
+Improbable,native|35-54,non_native|35-54,0.83489795918367349
+Improbable,native|35-54,non_native|55+,0.84615384615384615
+Improbable,native|55+,non_native|18-34,0.91666666666666663
+Improbable,native|55+,non_native|35-54,0.86968537414965985
+Improbable,native|55+,non_native|55+,0.88
+Improbable,non_native|18-34,non_native|35-54,0.94988662131519275
+Improbable,non_native|18-34,non_native|55+,0.95744680851063835
+Improbable,non_native|35-54,non_native|55+,0.90946591402518462
+Likely,native|18-34,native|35-54,0.82342807924202965
+Likely,native|18-34,native|55+,0.84217050287448159
+Likely,native|18-34,non_native|18-34,0.83894414273838691
+Likely,native|18-34,non_native|35-54,0.81159759127872377
+Likely,native|18-34,non_native|55+,0.69831649831649589
+Likely,native|35-54,native|55+,0.8770917484131564
+Likely,native|35-54,non_native|18-34,0.72761729742146675
+Likely,native|35-54,non_native|35-54,0.87440076701821667
+Likely,native|35-54,non_native|55+,0.72727272727272729
+Likely,native|55+,non_native|18-34,0.78740557698194946
+Likely,native|55+,non_native|35-54,0.92959051324810094
+Likely,native|55+,non_native|55+,0.82918660287081336
+Likely,non_native|18-34,non_native|35-54,0.84163042746685235
+Likely,non_native|18-34,non_native|55+,0.78367654445002499
+Likely,non_native|35-54,non_native|55+,0.83173843700159489
+Little Chance,native|18-34,native|35-54,0.90909090909090906
+Little Chance,native|18-34,native|55+,0.81046312178387647
+Little Chance,native|18-34,non_native|18-34,0.71049136786188583
+Little Chance,native|18-34,non_native|35-54,0.70185449358059904
+Little Chance,native|18-34,non_native|55+,0.80689655172413788
+Little Chance,native|35-54,native|55+,0.90137221269296741
+Little Chance,native|35-54,non_native|18-34,0.67441860465116277
+Little Chance,native|35-54,non_native|35-54,0.77203994293865896
+Little Chance,native|35-54,non_native|55+,0.80263157894736847
+Little Chance,native|55+,non_native|18-34,0.59872751206669583
+Little Chance,native|55+,non_native|35-54,0.69589535165397132
+Little Chance,native|55+,non_native|55+,0.71698113207547165
+Little Chance,non_native|18-34,non_native|35-54,0.90102098695405552
+Little Chance,non_native|18-34,non_native|55+,0.79209621993127155
+Little Chance,non_native|35-54,non_native|55+,0.83052781740370885
+May Happen,native|18-34,native|35-54,0.98101466759794298
+May Happen,native|18-34,native|55+,0.875
+May Happen,native|18-34,non_native|18-34,0.8960229995208433
+May Happen,native|18-34,non_native|35-54,0.8571428571428571
+May Happen,native|18-34,non_native|55+,0.78947368421052633
+May Happen,native|35-54,native|55+,0.86977106556394557
+May Happen,native|35-54,non_native|18-34,0.91336350934975774
+May Happen,native|35-54,non_native|35-54,0.87373092926490958
+May Happen,native|35-54,non_native|55+,0.80300410676790501
+May Happen,native|55+,non_native|18-34,0.86709657124882034
+May Happen,native|55+,non_native|35-54,0.8571428571428571
+May Happen,native|55+,non_native|55+,0.78947368421052633
+May Happen,non_native|18-34,non_native|35-54,0.94955257418276418
+May Happen,non_native|18-34,non_native|55+,0.84865388161534205
+May Happen,non_native|35-54,non_native|55+,0.89307170333232477
+Might Happen,native|18-34,native|35-54,0.99728807628379057
+Might Happen,native|18-34,native|55+,0.92360042129142106
+Might Happen,native|18-34,non_native|18-34,0.77583102493074718
+Might Happen,native|18-34,non_native|35-54,0.79162049861495776
+Might Happen,native|18-34,non_native|55+,0.86441318814276991
+Might Happen,native|35-54,native|55+,0.92592592592592593
+Might Happen,native|35-54,non_native|18-34,0.77368421052631575
+Might Happen,native|35-54,non_native|35-54,0.78947368421052633
+Might Happen,native|35-54,non_native|55+,0.86206896551724133
+Might Happen,native|55+,non_native|18-34,0.7277227722772277
+Might Happen,native|55+,non_native|35-54,0.83333333333333337
+Might Happen,native|55+,non_native|55+,0.84615384615384615
+Might Happen,non_native|18-34,non_native|35-54,0.88500000000000001
+Might Happen,non_native|18-34,non_native|55+,0.86082474226804129
+Might Happen,non_native|35-54,non_native|55+,0.88269370021723381
+Probable,native|18-34,native|35-54,0.86425576519916103
+Probable,native|18-34,native|55+,0.84825102880658398
+Probable,native|18-34,non_native|18-34,0.69753086419753052
+Probable,native|18-34,non_native|35-54,0.65436507936507904
+Probable,native|18-34,non_native|55+,0.65436507936507904
+Probable,native|35-54,native|55+,0.98148148148148151
+Probable,native|35-54,non_native|18-34,0.67716535433070868
+Probable,native|35-54,non_native|35-54,0.75714285714285712
+Probable,native|35-54,non_native|55+,0.75714285714285712
+Probable,native|55+,non_native|18-34,0.69291338582677164
+Probable,native|55+,non_native|35-54,0.77142857142857146
+Probable,native|55+,non_native|55+,0.77142857142857146
+Probable,non_native|18-34,non_native|35-54,0.76428571428571423
+Probable,non_native|18-34,non_native|55+,0.76428571428571423
+Probable,non_native|35-54,non_native|55+,1
+Realistic Possibility,native|18-34,native|35-54,0.99162342475908005
+Realistic Possibility,native|18-34,native|55+,0.99162342475908005
+Realistic Possibility,native|18-34,non_native|18-34,0.89718309859154854
+Realistic Possibility,native|18-34,non_native|35-54,0.89718309859154854
+Realistic Possibility,native|18-34,non_native|55+,0.8623937247802419
+Realistic Possibility,native|35-54,native|55+,1
+Realistic Possibility,native|35-54,non_native|18-34,0.90476190476190477
+Realistic Possibility,native|35-54,non_native|35-54,0.90476190476190477
+Realistic Possibility,native|35-54,non_native|55+,0.86972317453819781
+Realistic Possibility,native|55+,non_native|18-34,0.90476190476190477
+Realistic Possibility,native|55+,non_native|35-54,0.90476190476190477
+Realistic Possibility,native|55+,non_native|55+,0.86972317453819781
+Realistic Possibility,non_native|18-34,non_native|35-54,1
+Realistic Possibility,non_native|18-34,non_native|55+,0.9363636363636364
+Realistic Possibility,non_native|35-54,non_native|55+,0.9363636363636364
+Remote Chance,native|18-34,native|35-54,0.83870967741935487
+Remote Chance,native|18-34,native|55+,0.8125
+Remote Chance,native|18-34,non_native|18-34,0.56862745098039214
+Remote Chance,native|18-34,non_native|35-54,0.72951145240301873
+Remote Chance,native|18-34,non_native|55+,0.93548387096774188
+Remote Chance,native|35-54,native|55+,0.96296296296296291
+Remote Chance,native|35-54,non_native|18-34,0.47058823529411764
+Remote Chance,native|35-54,non_native|35-54,0.60373361578180862
+Remote Chance,native|35-54,non_native|55+,0.77419354838709675
+Remote Chance,native|55+,non_native|18-34,0.46153846153846156
+Remote Chance,native|55+,non_native|35-54,0.5889190236342503
+Remote Chance,native|55+,non_native|55+,0.75
+Remote Chance,non_native|18-34,non_native|35-54,0.77046186895810953
+Remote Chance,non_native|18-34,non_native|55+,0.59183673469387754
+Remote Chance,non_native|35-54,non_native|55+,0.7681583716715461
+Unlikely,native|18-34,native|35-54,0.81818181818181823
+Unlikely,native|18-34,native|55+,0.78947368421052633
+Unlikely,native|18-34,non_native|18-34,0.68965517241379315
+Unlikely,native|18-34,non_native|35-54,0.59322033898305082
+Unlikely,native|18-34,non_native|55+,0.46875
+Unlikely,native|35-54,native|55+,0.96153846153846156
+Unlikely,native|35-54,non_native|18-34,0.84905660377358494
+Unlikely,native|35-54,non_native|35-54,0.7407407407407407
+Unlikely,native|35-54,non_native|55+,0.59322033898305082
+Unlikely,native|55+,non_native|18-34,0.8867924528301887
+Unlikely,native|55+,non_native|35-54,0.77777777777777779
+Unlikely,native|55+,non_native|55+,0.6271186440677966
+Unlikely,non_native|18-34,non_native|35-54,0.87755102040816324
+Unlikely,non_native|18-34,non_native|55+,0.70370370370370372
+Unlikely,non_native|35-54,non_native|55+,0.79591836734693877
+Very Good Chance,native|18-34,native|35-54,1
+Very Good Chance,native|18-34,native|55+,0.82726242512546633
+Very Good Chance,native|18-34,non_native|18-34,0.82352941176470584
+Very Good Chance,native|18-34,non_native|35-54,0.77777777777777779
+Very Good Chance,native|18-34,non_native|55+,0.77777777777777779
+Very Good Chance,native|35-54,native|55+,0.82726242512546633
+Very Good Chance,native|35-54,non_native|18-34,0.82352941176470584
+Very Good Chance,native|35-54,non_native|35-54,0.77777777777777779
+Very Good Chance,native|35-54,non_native|55+,0.77777777777777779
+Very Good Chance,native|55+,non_native|18-34,0.8892279523954838
+Very Good Chance,native|55+,non_native|35-54,0.94018264840182553
+Very Good Chance,native|55+,non_native|55+,0.84551903865643618
+Very Good Chance,non_native|18-34,non_native|35-54,0.86965811965811979
+Very Good Chance,non_native|18-34,non_native|55+,0.7857142857142857
+Very Good Chance,non_native|35-54,non_native|55+,0.80000000000000004
+Will Happen,native|18-34,native|35-54,1
+Will Happen,native|18-34,native|55+,0.84213685474189637
+Will Happen,native|18-34,non_native|18-34,0.53488372093023251
+Will Happen,native|18-34,non_native|35-54,0.46938775510204084
+Will Happen,native|18-34,non_native|55+,0.45098039215686275
+Will Happen,native|35-54,native|55+,0.84213685474189637
+Will Happen,native|35-54,non_native|18-34,0.53488372093023251
+Will Happen,native|35-54,non_native|35-54,0.46938775510204084
+Will Happen,native|35-54,non_native|55+,0.45098039215686275
+Will Happen,native|55+,non_native|18-34,0.6273356009825003
+Will Happen,native|55+,non_native|35-54,0.55737704918032815
+Will Happen,native|55+,non_native|55+,0.53551912568306037
+Will Happen,non_native|18-34,non_native|35-54,0.87755102040816324
+Will Happen,non_native|18-34,non_native|55+,0.84313725490196079
+Will Happen,non_native|35-54,non_native|55+,0.96078431372549022

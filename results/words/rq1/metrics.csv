@@ -1,0 +1,400 @@
+metric,term,group,value
+n,About Even,native|18-34,757
+included,About Even,native|18-34,1
+n,About Even,native|35-54,2158
+included,About Even,native|35-54,1
+n,About Even,native|55+,1038
+included,About Even,native|55+,1
+n,About Even,non_native|18-34,247
+included,About Even,non_native|18-34,1
+n,About Even,non_native|35-54,406
+included,About Even,non_native|35-54,1
+n,About Even,non_native|55+,101
+included,About Even,non_native|55+,1
+n,About Even,pooled,5174
+iqr,About Even,pooled,0
+median,About Even,pooled,50
+pooled_centroid,About Even,pooled,50
+n_group_excluded,About Even,pooled,467
+fou_area,About Even,pooled,3
+centroid_left,About Even,pooled,48.080645161290327
+centroid_right,About Even,pooled,50.5
+centre,About Even,pooled,49.290322580645167
+n,Almost Certain,native|18-34,757
+included,Almost Certain,native|18-34,1
+n,Almost Certain,native|35-54,2158
+included,Almost Certain,native|35-54,1
+n,Almost Certain,native|55+,1038
+included,Almost Certain,native|55+,1
+n,Almost Certain,non_native|18-34,247
+included,Almost Certain,non_native|18-34,1
+n,Almost Certain,non_native|35-54,406
+included,Almost Certain,non_native|35-54,1
+n,Almost Certain,non_native|55+,101
+included,Almost Certain,non_native|55+,1
+n,Almost Certain,pooled,5174
+iqr,Almost Certain,pooled,8
+median,Almost Certain,pooled,95
+pooled_centroid,Almost Certain,pooled,92.909090909090907
+n_group_excluded,Almost Certain,pooled,467
+fou_area,Almost Certain,pooled,6.2500000000000009
+centroid_left,Almost Certain,pooled,90.708333333333329
+centroid_right,Almost Certain,pooled,94.128571428571433
+centre,Almost Certain,pooled,92.418452380952374
+n,Almost No Chance,native|18-34,757
+included,Almost No Chance,native|18-34,1
+n,Almost No Chance,native|35-54,2158
+included,Almost No Chance,native|35-54,1
+n,Almost No Chance,native|55+,1038
+included,Almost No Chance,native|55+,1
+n,Almost No Chance,non_native|18-34,247
+included,Almost No Chance,non_native|18-34,1
+n,Almost No Chance,non_native|35-54,406
+included,Almost No Chance,non_native|35-54,1
+n,Almost No Chance,non_native|55+,101
+included,Almost No Chance,non_native|55+,1
+n,Almost No Chance,pooled,5174
+iqr,Almost No Chance,pooled,4
+median,Almost No Chance,pooled,2
+pooled_centroid,Almost No Chance,pooled,4.2777777777777777
+n_group_excluded,Almost No Chance,pooled,467
+fou_area,Almost No Chance,pooled,0.25
+centroid_left,Almost No Chance,pooled,4.1428571428571432
+centroid_right,Almost No Chance,pooled,4.2777777777777777
+centre,Almost No Chance,pooled,4.2103174603174605
+n,Better than Even,native|18-34,757
+included,Better than Even,native|18-34,1
+n,Better than Even,native|35-54,2158
+included,Better than Even,native|35-54,1
+n,Better than Even,native|55+,1038
+included,Better than Even,native|55+,1
+n,Better than Even,non_native|18-34,247
+included,Better than Even,non_native|18-34,1
+n,Better than Even,non_native|35-54,406
+included,Better than Even,non_native|35-54,1
+n,Better than Even,non_native|55+,101
+included,Better than Even,non_native|55+,1
+n,Better than Even,pooled,5174
+iqr,Better than Even,pooled,5
+median,Better than Even,pooled,60
+pooled_centroid,Better than Even,pooled,59.291666666666664
+n_group_excluded,Better than Even,pooled,467
+fou_area,Better than Even,pooled,4.5
+centroid_left,Better than Even,pooled,58.083333333333336
+centroid_right,Better than Even,pooled,60.851180195739779
+centre,Better than Even,pooled,59.467256764536558
+n,Chances are Slight,native|18-34,757
+included,Chances are Slight,native|18-34,1
+n,Chances are Slight,native|35-54,2158
+included,Chances are Slight,native|35-54,1
+n,Chances are Slight,native|55+,1038
+included,Chances are Slight,native|55+,1
+n,Chances are Slight,non_native|18-34,247
+included,Chances are Slight,non_native|18-34,1
+n,Chances are Slight,non_native|35-54,406
+included,Chances are Slight,non_native|35-54,1
+n,Chances are Slight,non_native|55+,101
+included,Chances are Slight,non_native|55+,1
+n,Chances are Slight,pooled,5174
+iqr,Chances are Slight,pooled,10
+median,Chances are Slight,pooled,10
+pooled_centroid,Chances are Slight,pooled,13.747747747747749
+n_group_excluded,Chances are Slight,pooled,467
+fou_area,Chances are Slight,pooled,13
+centroid_left,Chances are Slight,pooled,11.979797979797981
+centroid_right,Chances are Slight,pooled,18.987573099415201
+centre,Chances are Slight,pooled,15.48368553960659
+n,Could Happen,native|18-34,757
+included,Could Happen,native|18-34,1
+n,Could Happen,native|35-54,2158
+included,Could Happen,native|35-54,1
+n,Could Happen,native|55+,1038
+included,Could Happen,native|55+,1
+n,Could Happen,non_native|18-34,247
+included,Could Happen,non_native|18-34,1
+n,Could Happen,non_native|35-54,406
+included,Could Happen,non_native|35-54,1
+n,Could Happen,non_native|55+,101
+included,Could Happen,non_native|55+,1
+n,Could Happen,pooled,5174
+iqr,Could Happen,pooled,25
+median,Could Happen,pooled,40
+pooled_centroid,Could Happen,pooled,38.921568627450981
+n_group_excluded,Could Happen,pooled,467
+fou_area,Could Happen,pooled,11.749999999999972
+centroid_left,Could Happen,pooled,36.078431372549019
+centroid_right,Could Happen,pooled,42.070621468926539
+centre,Could Happen,pooled,39.074526420737783
+n,Highly Likely,native|18-34,757
+included,Highly Likely,native|18-34,1
+n,Highly Likely,native|35-54,2158
+included,Highly Likely,native|35-54,1
+n,Highly Likely,native|55+,1038
+included,Highly Likely,native|55+,1
+n,Highly Likely,non_native|18-34,247
+included,Highly Likely,non_native|18-34,1
+n,Highly Likely,non_native|35-54,406
+included,Highly Likely,non_native|35-54,1
+n,Highly Likely,non_native|55+,101
+included,Highly Likely,non_native|55+,1
+n,Highly Likely,pooled,5174
+iqr,Highly Likely,pooled,10
+median,Highly Likely,pooled,90
+pooled_centroid,Highly Likely,pooled,85
+n_group_excluded,Highly Likely,pooled,467
+fou_area,Highly Likely,pooled,4
+centroid_left,Highly Likely,pooled,83.571428571428569
+centroid_right,Highly Likely,pooled,85.848484848484844
+centre,Highly Likely,pooled,84.709956709956714
+n,Highly Unlikely,native|18-34,757
+included,Highly Unlikely,native|18-34,1
+n,Highly Unlikely,native|35-54,2158
+included,Highly Unlikely,native|35-54,1
+n,Highly Unlikely,native|55+,1038
+included,Highly Unlikely,native|55+,1
+n,Highly Unlikely,non_native|18-34,247
+included,Highly Unlikely,non_native|18-34,1
+n,Highly Unlikely,non_native|35-54,406
+included,Highly Unlikely,non_native|35-54,1
+n,Highly Unlikely,non_native|55+,101
+included,Highly Unlikely,non_native|55+,1
+n,Highly Unlikely,pooled,5174
+iqr,Highly Unlikely,pooled,5
+median,Highly Unlikely,pooled,5
+pooled_centroid,Highly Unlikely,pooled,9.2916666666666661
+n_group_excluded,Highly Unlikely,pooled,467
+fou_area,Highly Unlikely,pooled,4
+centroid_left,Highly Unlikely,pooled,8.5555555555555571
+centroid_right,Highly Unlikely,pooled,10.850776308223114
+centre,Highly Unlikely,pooled,9.7031659318893357
+n,Improbable,native|18-34,757
+included,Improbable,native|18-34,1
+n,Improbable,native|35-54,2158
+included,Improbable,native|35-54,1
+n,Improbable,native|55+,1038
+included,Improbable,native|55+,1
+n,Improbable,non_native|18-34,247
+included,Improbable,non_native|18-34,1
+n,Improbable,non_native|35-54,406
+included,Improbable,non_native|35-54,1
+n,Improbable,non_native|55+,101
+included,Improbable,non_native|55+,1
+n,Improbable,pooled,5174
+iqr,Improbable,pooled,15
+median,Improbable,pooled,10
+pooled_centroid,Improbable,pooled,15.12451061810401
+n_group_excluded,Improbable,pooled,467
+fou_area,Improbable,pooled,5.1275510204081627
+centroid_left,Improbable,pooled,12.949638920562524
+centroid_right,Improbable,pooled,15.605442176870747
+centre,Improbable,pooled,14.277540548716637
+n,Likely,native|18-34,757
+included,Likely,native|18-34,1
+n,Likely,native|35-54,2158
+included,Likely,native|35-54,1
+n,Likely,native|55+,1038
+included,Likely,native|55+,1
+n,Likely,non_native|18-34,247
+included,Likely,non_native|18-34,1
+n,Likely,non_native|35-54,406
+included,Likely,non_native|35-54,1
+n,Likely,non_native|55+,101
+included,Likely,non_native|55+,1
+n,Likely,pooled,5174
+iqr,Likely,pooled,13
+median,Likely,pooled,75
+pooled_centroid,Likely,pooled,74.348837209302332
+n_group_excluded,Likely,pooled,467
+fou_area,Likely,pooled,10
+centroid_left,Likely,pooled,69.666666666666671
+centroid_right,Likely,pooled,75
+centre,Likely,pooled,72.333333333333343
+n,Little Chance,native|18-34,757
+included,Little Chance,native|18-34,1
+n,Little Chance,native|35-54,2158
+included,Little Chance,native|35-54,1
+n,Little Chance,native|55+,1038
+included,Little Chance,native|55+,1
+n,Little Chance,non_native|18-34,247
+included,Little Chance,non_native|18-34,1
+n,Little Chance,non_native|35-54,406
+included,Little Chance,non_native|35-54,1
+n,Little Chance,non_native|55+,101
+included,Little Chance,non_native|55+,1
+n,Little Chance,pooled,5174
+iqr,Little Chance,pooled,10
+median,Little Chance,pooled,10
+pooled_centroid,Little Chance,pooled,11.979797979797981
+n_group_excluded,Little Chance,pooled,467
+fou_area,Little Chance,pooled,9.1630727762803232
+centroid_left,Little Chance,pooled,11.404006766042922
+centroid_right,Little Chance,pooled,15.726593753440744
+centre,Little Chance,pooled,13.565300259741832
+n,May Happen,native|18-34,757
+included,May Happen,native|18-34,1
+n,May Happen,native|35-54,2158
+included,May Happen,native|35-54,1
+n,May Happen,native|55+,1038
+included,May Happen,native|55+,1
+n,May Happen,non_native|18-34,247
+included,May Happen,non_native|18-34,1
+n,May Happen,non_native|35-54,406
+included,May Happen,non_native|35-54,1
+n,May Happen,non_native|55+,101
+included,May Happen,non_native|55+,1
+n,May Happen,pooled,5174
+iqr,May Happen,pooled,21
+median,May Happen,pooled,40
+pooled_centroid,May Happen,pooled,40.209876543209873
+n_group_excluded,May Happen,pooled,467
+fou_area,May Happen,pooled,13.360416666666667
+centroid_left,May Happen,pooled,37.5
+centroid_right,May Happen,pooled,44.624993994138279
+centre,May Happen,pooled,41.06249699706914
+n,Might Happen,native|18-34,757
+included,Might Happen,native|18-34,1
+n,Might Happen,native|35-54,2158
+included,Might Happen,native|35-54,1
+n,Might Happen,native|55+,1038
+included,Might Happen,native|55+,1
+n,Might Happen,non_native|18-34,247
+included,Might Happen,non_native|18-34,1
+n,Might Happen,non_native|35-54,406
+included,Might Happen,non_native|35-54,1
+n,Might Happen,non_native|55+,101
+included,Might Happen,non_native|55+,1
+n,Might Happen,pooled,5174
+iqr,Might Happen,pooled,25
+median,Might Happen,pooled,40
+pooled_centroid,Might Happen,pooled,37.781893004115226
+n_group_excluded,Might Happen,pooled,467
+fou_area,Might Happen,pooled,13.750000000000002
+centroid_left,Might Happen,pooled,37.279835390946502
+centroid_right,Might Happen,pooled,44.020499108734406
+centre,Might Happen,pooled,40.65016724984045
+n,Probable,native|18-34,757
+included,Probable,native|18-34,1
+n,Probable,native|35-54,2158
+included,Probable,native|35-54,1
+n,Probable,native|55+,1038
+included,Probable,native|55+,1
+n,Probable,non_native|18-34,247
+included,Probable,non_native|18-34,1
+n,Probable,non_native|35-54,406
+included,Probable,non_native|35-54,1
+n,Probable,non_native|55+,101
+included,Probable,non_native|55+,1
+n,Probable,pooled,5174
+iqr,Probable,pooled,15
+median,Probable,pooled,75
+pooled_centroid,Probable,pooled,71.351851851851848
+n_group_excluded,Probable,pooled,467
+fou_area,Probable,pooled,14.59722222222223
+centroid_left,Probable,pooled,64.583333333333329
+centroid_right,Probable,pooled,72.270730818297793
+centre,Probable,pooled,68.427032075815561
+n,Realistic Possibility,native|18-34,757
+included,Realistic Possibility,native|18-34,1
+n,Realistic Possibility,native|35-54,2158
+included,Realistic Possibility,native|35-54,1
+n,Realistic Possibility,native|55+,1038
+included,Realistic Possibility,native|55+,1
+n,Realistic Possibility,non_native|18-34,247
+included,Realistic Possibility,non_native|18-34,1
+n,Realistic Possibility,non_native|35-54,406
+included,Realistic Possibility,non_native|35-54,1
+n,Realistic Possibility,non_native|55+,101
+included,Realistic Possibility,non_native|55+,1
+n,Realistic Possibility,pooled,5174
+iqr,Realistic Possibility,pooled,35
+median,Realistic Possibility,pooled,60
+pooled_centroid,Realistic Possibility,pooled,54.75
+n_group_excluded,Realistic Possibility,pooled,467
+fou_area,Realistic Possibility,pooled,8.1839984350548072
+centroid_left,Realistic Possibility,pooled,51.945730105771268
+centroid_right,Realistic Possibility,pooled,56.206211984181877
+centre,Realistic Possibility,pooled,54.075971044976569
+n,Remote Chance,native|18-34,757
+included,Remote Chance,native|18-34,1
+n,Remote Chance,native|35-54,2158
+included,Remote Chance,native|35-54,1
+n,Remote Chance,native|55+,1038
+included,Remote Chance,native|55+,1
+n,Remote Chance,non_native|18-34,247
+included,Remote Chance,non_native|18-34,1
+n,Remote Chance,non_native|35-54,406
+included,Remote Chance,non_native|35-54,1
+n,Remote Chance,non_native|55+,101
+included,Remote Chance,non_native|55+,1
+n,Remote Chance,pooled,5174
+iqr,Remote Chance,pooled,7
+median,Remote Chance,pooled,5
+pooled_centroid,Remote Chance,pooled,10.344086021505374
+n_group_excluded,Remote Chance,pooled,467
+fou_area,Remote Chance,pooled,14
+centroid_left,Remote Chance,pooled,8.5555555555555571
+centroid_right,Remote Chance,pooled,16.468113374667851
+centre,Remote Chance,pooled,12.511834465111704
+n,Unlikely,native|18-34,757
+included,Unlikely,native|18-34,1
+n,Unlikely,native|35-54,2158
+included,Unlikely,native|35-54,1
+n,Unlikely,native|55+,1038
+included,Unlikely,native|55+,1
+n,Unlikely,non_native|18-34,247
+included,Unlikely,non_native|18-34,1
+n,Unlikely,non_native|35-54,406
+included,Unlikely,non_native|35-54,1
+n,Unlikely,non_native|55+,101
+included,Unlikely,non_native|55+,1
+n,Unlikely,pooled,5174
+iqr,Unlikely,pooled,15
+median,Unlikely,pooled,20
+pooled_centroid,Unlikely,pooled,20.333333333333336
+n_group_excluded,Unlikely,pooled,467
+fou_area,Unlikely,pooled,17
+centroid_left,Unlikely,pooled,14.158703071672354
+centroid_right,Unlikely,pooled,22.51015228426396
+centre,Unlikely,pooled,18.334427677968158
+n,Very Good Chance,native|18-34,757
+included,Very Good Chance,native|18-34,1
+n,Very Good Chance,native|35-54,2158
+included,Very Good Chance,native|35-54,1
+n,Very Good Chance,native|55+,1038
+included,Very Good Chance,native|55+,1
+n,Very Good Chance,non_native|18-34,247
+included,Very Good Chance,non_native|18-34,1
+n,Very Good Chance,non_native|35-54,406
+included,Very Good Chance,non_native|35-54,1
+n,Very Good Chance,non_native|55+,101
+included,Very Good Chance,non_native|55+,1
+n,Very Good Chance,pooled,5174
+iqr,Very Good Chance,pooled,10
+median,Very Good Chance,pooled,80
+pooled_centroid,Very Good Chance,pooled,78.262221524945133
+n_group_excluded,Very Good Chance,pooled,467
+fou_area,Very Good Chance,pooled,8.4000000000000004
+centroid_left,Very Good Chance,pooled,76.111111111111114
+centroid_right,Very Good Chance,pooled,80.337320574162689
+centre,Very Good Chance,pooled,78.224215842636909
+n,Will Happen,native|18-34,757
+included,Will Happen,native|18-34,1
+n,Will Happen,native|35-54,2158
+included,Will Happen,native|35-54,1
+n,Will Happen,native|55+,1038
+included,Will Happen,native|55+,1
+n,Will Happen,non_native|18-34,247
+included,Will Happen,non_native|18-34,1
+n,Will Happen,non_native|35-54,406
+included,Will Happen,non_native|35-54,1
+n,Will Happen,non_native|55+,101
+included,Will Happen,non_native|55+,1
+n,Will Happen,pooled,5174
+iqr,Will Happen,pooled,1
+median,Will Happen,pooled,100
+pooled_centroid,Will Happen,pooled,96.78985507246378
+n_group_excluded,Will Happen,pooled,467
+fou_area,Will Happen,pooled,7
+centroid_left,Will Happen,pooled,92.804909560723516
+centroid_right,Will Happen,pooled,96.822580645161281
+centre,Will Happen,pooled,94.813745102942391
