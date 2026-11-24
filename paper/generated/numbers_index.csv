@@ -4179,6 +4179,12 @@ macro,value,source
 \WthreeNFallbackNonNativeOneEightThreeFour,154,results/words/rq3/per_item.csv:sum fallback_non_native_18-34
 \WthreeNFallbackNonNativeThreeFiveFiveFour,154,results/words/rq3/per_item.csv:sum fallback_non_native_35-54
 \WthreeNFallbackNonNativeFiveFive,154,results/words/rq3/per_item.csv:sum fallback_non_native_55+
+\WthreeNIntermediate,36,results/words/rq3/per_item.csv:0 < m < 100
+\WthreeNFlipsIntermediate,9,results/words/rq3/per_item.csv:flips with 0 < m < 100
+\WthreeFlipShareIntermediate,0.250,results/words/rq3/per_item.csv:flips / items with 0 < m < 100
+\WthreeFlipShareIntermediatePct,25.0,results/words/rq3/per_item.csv:flips / items with 0 < m < 100
+\WthreeNIntermediateClean,19,results/words/rq3/per_item.csv:0 < m < 100 without fallback
+\WthreeNFlipsIntermediateClean,5,"results/words/rq3/per_item.csv:flips, 0 < m < 100, no fallback"
 \WthreeMinObserved,6,results/words/rq3/per_item.csv:min n_llm_observed
 \WthreeMaxObserved,9,results/words/rq3/per_item.csv:max n_llm_observed
 \WthreeLlmGapLow,20,results/words/rq2/codebooks/llm_it2.csv:P1 Remote Chance max x with umf>0

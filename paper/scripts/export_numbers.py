@@ -247,6 +247,18 @@ def words_rq3(m: Macros) -> None:
     m.add('WthreeNItemsClean', str(int((~fb).sum())), f'{src}:items without fallback')
     for col in [c for c in t.columns if c.startswith('fallback_')]:
         m.add('WthreeNFallback' + camel(col[len('fallback_'):]), fmt_int(t[col].sum()), f'{src}:sum {col}')
+    # Post-hoc description (PM review of PR B): flips among messages with an uncertain crisis degree, 0 < m < 100.
+    inter = (t.m > 0) & (t.m < 100)
+    action_cols = [c for c in t.columns if c.startswith('action_')]
+    if t.loc[~inter, action_cols].nunique(axis=1).max() != 1:
+        raise ValueError('Codebooks disagree at m = 0 or m = 100')
+    if (flip & ~inter).any():
+        raise ValueError('Flip outside 0 < m < 100')
+    m.add('WthreeNIntermediate', str(int(inter.sum())), f'{src}:0 < m < 100')
+    m.add('WthreeNFlipsIntermediate', str(int((flip & inter).sum())), f'{src}:flips with 0 < m < 100')
+    m.add_share('WthreeFlipShareIntermediate', (flip & inter).sum() / inter.sum(), f'{src}:flips / items with 0 < m < 100')
+    m.add('WthreeNIntermediateClean', str(int((inter & ~fb).sum())), f'{src}:0 < m < 100 without fallback')
+    m.add('WthreeNFlipsIntermediateClean', str(int((flip & inter & ~fb).sum())), f'{src}:flips, 0 < m < 100, no fallback')
     m.add('WthreeMinObserved', str(int(t.n_llm_observed.min())), f'{src}:min n_llm_observed')
     m.add('WthreeMaxObserved', str(int(t.n_llm_observed.max())), f'{src}:max n_llm_observed')
     llm = pd.read_csv(W / 'rq2/codebooks/llm_it2.csv')
