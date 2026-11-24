@@ -58,7 +58,11 @@ MAX_REASKS = 2
 NUM_PREDICT = 64  # cap on generated tokens; a single number needs far fewer
 TIMEOUT_S = 300
 
-COLUMNS = ['model', 'digest', 'prompt_id', 'term', 'sample', 'raw_text', 'value', 'attempts', 'timestamp']
+OLD_COLUMNS = ['model', 'digest', 'prompt_id', 'term', 'sample', 'raw_text', 'value', 'attempts', 'timestamp']
+# done_reason: Ollama's done_reason for the final attempt ('stop', or 'length' if NUM_PREDICT was hit).
+# Files written before it existed are upgraded on first use with an empty done_reason (D18 ruling 3).
+COLUMNS = OLD_COLUMNS + ['done_reason']
+SUP_EXTRA = ['reason']
 BARE_NUMBER = re.compile(r'^(-?\d+(?:\.\d+)?)\s*%?\s*\.?$')  # D19
 REQUEUE_REASON = 'D19: raw_text is not a bare number in [0, 100]'
 
@@ -81,16 +85,19 @@ def parse_value(text: str | None) -> float | None:
     return value if 0 <= value <= 100 else None
 
 
-def ask(client, model: str, prompt: str, seed: int) -> tuple[str, float | None, int]:
-    """Ask once, then re-ask the same prompt up to MAX_REASKS times. Returns (raw_text, value, attempts)."""
+def ask(client, model: str, prompt: str, seed: int) -> tuple[str, float | None, int, str]:
+    """Ask once, then re-ask the same prompt up to MAX_REASKS times.
+
+    Returns (raw_text, value, attempts, done_reason), all of the final attempt.
+    """
     messages = [{'role': 'user', 'content': prompt}]
     for attempt in range(1, MAX_REASKS + 2):
-        raw = client.chat(model, messages, seed)
+        raw, done_reason = client.chat(model, messages, seed)
         value = parse_value(raw)
         if value is not None:
-            return raw, value, attempt
+            return raw, value, attempt, done_reason
         messages += [{'role': 'assistant', 'content': raw}, {'role': 'user', 'content': prompt}]
-    return raw, None, attempt
+    return raw, None, attempt, done_reason
 
 
 class OllamaClient:
@@ -111,12 +118,12 @@ class OllamaClient:
                     out[m[key]] = m['digest']
         return out
 
-    def chat(self, model: str, messages: list[dict], seed: int) -> str:
+    def chat(self, model: str, messages: list[dict], seed: int) -> tuple[str, str]:
         resp = self._request('/api/chat', {
             'model': model, 'messages': messages, 'stream': False,
             'options': {'temperature': TEMPERATURE, 'seed': seed, 'num_predict': NUM_PREDICT},
         })
-        return resp['message']['content']
+        return resp['message']['content'], resp.get('done_reason') or ''
 
 
 class FakeClient:
@@ -128,11 +135,12 @@ class FakeClient:
     def tags(self) -> dict[str, str]:
         return {m: 'dry-run' for m in self.models}
 
-    def chat(self, model: str, messages: list[dict], seed: int) -> str:
+    def chat(self, model: str, messages: list[dict], seed: int) -> tuple[str, str]:
         key = json.dumps([model, messages, seed]).encode()
         h = int.from_bytes(hashlib.sha256(key).digest()[:8], 'big')
         v = h % 101
-        return [f'{v}', f'{v}%', f'About {v}%', '## Step 1: Understand the phrase'][(h >> 8) % 4]
+        i = (h >> 8) % 4
+        return [f'{v}', f'{v}%', f'About {v}%', '## Step 1: Understand the phrase'][i], 'length' if i == 3 else 'stop'
 
 
 def normalise_tag(tag: str) -> str:
@@ -146,22 +154,56 @@ def load_config(path: Path) -> dict:
     return cfg
 
 
+def read_rows(path: Path, extra: list[str] = ()) -> tuple[list[dict], bool]:
+    """Rows with the current columns (+ extra). The pre-done_reason schema is accepted: done_reason = ''.
+
+    Returns (rows, is_old_schema).
+    """
+    new, old = COLUMNS + list(extra), OLD_COLUMNS + list(extra)
+    with path.open(newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames not in (new, old):
+            raise SystemExit(f'{path}: unexpected header {reader.fieldnames}')
+        is_old = reader.fieldnames == old
+        rows = [{c: r.get(c, '') for c in new} for r in reader]
+    return rows, is_old
+
+
+def write_rows(path: Path, rows: list[dict], extra: list[str] = ()) -> None:
+    """Atomically replace ``path`` with ``rows`` in the current schema."""
+    cols = COLUMNS + list(extra)
+    tmp = path.with_suffix(path.suffix + '.tmp')
+    with tmp.open('w', newline='', encoding='utf-8') as f:
+        w = csv.writer(f)
+        w.writerow(cols)
+        w.writerows([r[c] for c in cols] for r in rows)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
+def upgrade_schema(path: Path, extra: list[str] = (), log=print) -> None:
+    """Add the empty done_reason column to a file in the old schema. No other value changes."""
+    if not path.is_file() or path.stat().st_size == 0:
+        return
+    rows, is_old = read_rows(path, extra)
+    if is_old:
+        write_rows(path, rows, extra)
+        log(f'{path}: added empty done_reason column to {len(rows)} existing rows')
+
+
 def read_existing(out: Path) -> tuple[set, dict[str, str]]:
     """Keys already written and the digest recorded per model."""
     done, digests = set(), {}
     if not out.is_file() or out.stat().st_size == 0:
         return done, digests
-    with out.open(newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        if reader.fieldnames != COLUMNS:
-            raise SystemExit(f'{out}: unexpected header {reader.fieldnames}')
-        for r in reader:
-            key = (r['model'], r['prompt_id'], r['term'], int(r['sample']))
-            if key in done:
-                raise SystemExit(f'{out}: duplicate row {key}')
-            done.add(key)
-            if digests.setdefault(r['model'], r['digest']) != r['digest']:
-                raise SystemExit(f'{out}: several digests for {r["model"]}')
+    for r in read_rows(out)[0]:
+        key = (r['model'], r['prompt_id'], r['term'], int(r['sample']))
+        if key in done:
+            raise SystemExit(f'{out}: duplicate row {key}')
+        done.add(key)
+        if digests.setdefault(r['model'], r['digest']) != r['digest']:
+            raise SystemExit(f'{out}: several digests for {r["model"]}')
     return done, digests
 
 
@@ -175,11 +217,7 @@ def requeue_invalid(out: Path, log=print) -> dict[tuple, int]:
     """
     if not out.is_file():
         raise SystemExit(f'{out} does not exist')
-    with out.open(newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        if reader.fieldnames != COLUMNS:
-            raise SystemExit(f'{out}: unexpected header {reader.fieldnames}')
-        rows = list(reader)
+    rows, _ = read_rows(out)
     keep, move = [], []
     for r in rows:
         value = parse_value(r['raw_text'])
@@ -203,14 +241,11 @@ def requeue_invalid(out: Path, log=print) -> dict[tuple, int]:
         return counts
 
     sup = out.with_name(SUPERSEDED_NAME)
-    sup_cols = COLUMNS + ['reason']
+    sup_cols = COLUMNS + SUP_EXTRA
+    upgrade_schema(sup, SUP_EXTRA, log=log)
     seen = set()
     if sup.is_file() and sup.stat().st_size:
-        with sup.open(newline='', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            if reader.fieldnames != sup_cols:
-                raise SystemExit(f'{sup}: unexpected header {reader.fieldnames}')
-            seen = {tuple(r[c] for c in COLUMNS) for r in reader}
+        seen = {tuple(r[c] for c in COLUMNS) for r in read_rows(sup, SUP_EXTRA)[0]}
     new_sup = not sup.is_file() or sup.stat().st_size == 0
     with sup.open('a', newline='', encoding='utf-8') as f:  # append first: a crash never loses a row
         w = csv.writer(f)
@@ -221,12 +256,7 @@ def requeue_invalid(out: Path, log=print) -> dict[tuple, int]:
                 w.writerow([r[c] for c in COLUMNS] + [REQUEUE_REASON])
         f.flush()
         os.fsync(f.fileno())
-    tmp = out.with_suffix(out.suffix + '.tmp')
-    with tmp.open('w', newline='', encoding='utf-8') as f:
-        w = csv.writer(f)
-        w.writerow(COLUMNS)
-        w.writerows([r[c] for c in COLUMNS] for r in keep)
-    os.replace(tmp, out)
+    write_rows(out, keep)  # also upgrades an old-schema file (empty done_reason)
     log(f'Moved {len(move)} rows to {sup}; rerun without --requeue-invalid to request them again')
     return counts
 
@@ -240,6 +270,7 @@ def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS
         raise SystemExit(f'Models not available in Ollama: {missing}. Run: ollama pull <tag>')
     digest = {m: available[normalise_tag(m)] for m in models}
 
+    upgrade_schema(out, log=log)
     done, recorded = read_existing(out)
     for m in models:
         if m in recorded and recorded[m] != digest[m]:
@@ -252,7 +283,7 @@ def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS
     log(f'{total} answers planned, {total - todo} already in {out}, {todo} to request')
     out.parent.mkdir(parents=True, exist_ok=True)
     new_file = not out.is_file() or out.stat().st_size == 0
-    written, start = 0, time.monotonic()
+    written, capped, start = 0, 0, time.monotonic()
     with out.open('a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         if new_file:
@@ -263,16 +294,19 @@ def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS
                     for sample in range(n_samples):
                         if (model, pid, term, sample) in done:
                             continue
-                        raw, value, attempts = ask(client, model, prompt_text(pid, term), SEED_BASE + sample)
+                        raw, value, attempts, done_reason = ask(client, model, prompt_text(pid, term),
+                                                                SEED_BASE + sample)
                         writer.writerow([model, digest[model], pid, term, sample, raw,
                                          '' if value is None else f'{value:g}', attempts,
-                                         datetime.now(timezone.utc).isoformat(timespec='seconds')])
+                                         datetime.now(timezone.utc).isoformat(timespec='seconds'), done_reason])
                         f.flush()
                         written += 1
+                        capped += done_reason == 'length'
                         if written % 100 == 0:
                             rate = (time.monotonic() - start) / written
                             log(f'{written}/{todo} written, about {rate * (todo - written) / 60:.0f} min left')
-    log(f'Done: {written} rows written to {out}')
+    log(f'Done: {written} rows written to {out}; {capped} final replies hit num_predict={NUM_PREDICT} '
+        "(done_reason == 'length')")
     return written
 
 

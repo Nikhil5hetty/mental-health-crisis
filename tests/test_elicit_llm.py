@@ -31,7 +31,8 @@ class Scripted:
 
     def chat(self, model, messages, seed):
         self.calls.append((list(messages), seed))
-        return self.replies.pop(0)
+        reply = self.replies.pop(0)
+        return reply if isinstance(reply, tuple) else (reply, 'stop')
 
 
 class Crashing(el.FakeClient):
@@ -66,7 +67,7 @@ def test_prompts_follow_plan():
 
 def test_reask_until_parsable():
     c = Scripted(['N/A', '70%'])
-    assert el.ask(c, 'm:1', 'Q', 7) == ('70%', 70.0, 2)
+    assert el.ask(c, 'm:1', 'Q', 7) == ('70%', 70.0, 2, 'stop')
     first, second = c.calls
     assert first == ([{'role': 'user', 'content': 'Q'}], 7)
     assert second[0][1:] == [{'role': 'assistant', 'content': 'N/A'}, {'role': 'user', 'content': 'Q'}]
@@ -74,8 +75,8 @@ def test_reask_until_parsable():
 
 
 def test_missing_after_two_reasks():
-    c = Scripted(['## Step 1: Understand', 'about 70', '200', 'never asked'])
-    assert el.ask(c, 'm:1', 'Q', 7) == ('200', None, 3)
+    c = Scripted([('## Step 1: Understand', 'length'), 'about 70', ('## Step 1: Again', 'length'), 'never asked'])
+    assert el.ask(c, 'm:1', 'Q', 7) == ('## Step 1: Again', None, 3, 'length')  # done_reason of the final attempt
     assert len(c.calls) == 3
 
 
@@ -138,10 +139,10 @@ def test_terms_match_capphrase():
 
 
 def write_answers(path, raws):
-    """Rows as the pre-D19 harness wrote them: value = first number in [0, 100], else missing."""
+    """Rows as the pre-D19 harness wrote them (old schema, no done_reason): value = first number, else missing."""
     with path.open('w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
-        w.writerow(el.COLUMNS)
+        w.writerow(el.OLD_COLUMNS)
         for i, (term, raw, value, attempts) in enumerate(raws):
             w.writerow(['m:1', 'sha256:aaa', 'P1', term, i, raw, value, attempts, '2026-11-24T12:00:00+00:00'])
 
@@ -167,7 +168,8 @@ def test_requeue_moves_only_strict_failures(tmp_path):
     assert [r['raw_text'] for r in sup] == ['## Step 1: Understand the phrase', 'About 70%']
     assert list(sup[0]) == el.COLUMNS + ['reason'] and sup[0]['reason'] == el.REQUEUE_REASON
     original = {r['sample']: r for r in csv.DictReader(before.splitlines())}
-    assert [{k: r[k] for k in el.COLUMNS} for r in sup] == [original['0'], original['3']]  # copied unchanged
+    assert [{k: r[k] for k in el.OLD_COLUMNS} for r in sup] == [original['0'], original['3']]  # copied unchanged
+    assert all(r['done_reason'] == '' for r in sup + kept)
     assert any('2 to requeue' in line for line in logged)
     # Idempotent: nothing more to move, superseded.csv unchanged.
     assert el.requeue_invalid(out, log=lambda *_: None) == {}
@@ -201,3 +203,38 @@ def test_requeue_rejects_value_mismatch(tmp_path):
     write_answers(out, [('Likely', '70', '71', 1)])
     with pytest.raises(SystemExit, match='differs'):
         el.requeue_invalid(out, log=lambda *_: None)
+
+
+def test_dry_run_records_done_reason(tmp_path):
+    out = tmp_path / 'a.csv'
+    el.run(['m:1'], el.FakeClient(['m:1']), out, terms=el.TERMS[:4], n_samples=10, log=lambda *_: None)
+    r = rows(out)
+    assert list(r[0]) == el.COLUMNS and el.COLUMNS[-1] == 'done_reason'
+    assert {x['done_reason'] for x in r} == {'stop', 'length'}
+    assert all(x['done_reason'] == 'length' for x in r if x['raw_text'].startswith('## Step'))
+
+
+def test_resume_accepts_old_schema(tmp_path):
+    out = tmp_path / 'answers.csv'
+    write_answers(out, [('Likely', '70', '70', 1), ('Likely', '65%', '65', 1)])
+    old_lines = out.read_text(encoding='utf-8').splitlines()
+    c = Scripted([('## Step 1', 'length'), '60'])
+    c.tags = lambda: {'m:1': 'sha256:aaa'}
+    assert el.run(['m:1'], c, out, prompt_ids=['P1'], terms=['Likely'], n_samples=3, log=lambda *_: None) == 1
+    new_lines = out.read_text(encoding='utf-8').splitlines()
+    assert new_lines[0] == ','.join(el.COLUMNS)
+    assert new_lines[1:3] == [line + ',' for line in old_lines[1:]]  # old rows unchanged, empty done_reason
+    assert rows(out)[2]['done_reason'] == 'stop' and rows(out)[2]['attempts'] == '2'
+
+
+def test_requeue_upgrades_old_superseded(tmp_path):
+    out, sup = tmp_path / 'answers.csv', tmp_path / 'superseded.csv'
+    with sup.open('w', newline='', encoding='utf-8') as f:  # superseded.csv from the pre-done_reason harness
+        w = csv.writer(f)
+        w.writerow(el.OLD_COLUMNS + ['reason'])
+        w.writerow(['m:1', 'sha256:aaa', 'P1', 'Likely', 9, '## Step 1', '1', 1, 't', el.REQUEUE_REASON])
+    write_answers(out, PRE_D19[:1])
+    el.requeue_invalid(out, log=lambda *_: None)
+    r = rows(sup)
+    assert list(r[0]) == el.COLUMNS + ['reason'] and len(r) == 2
+    assert [x['sample'] for x in r] == ['9', '0'] and all(x['done_reason'] == '' for x in r)
