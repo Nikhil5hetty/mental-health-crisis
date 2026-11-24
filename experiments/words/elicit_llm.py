@@ -2,9 +2,10 @@
 """Elicit LLM probability values for the CAPphrase terms (docs/ANALYSIS_PLAN_WORDS.md, RQ2).
 
 For each model x prompt (P1, P2) x term (19) x sample (50) one answer is requested from a local Ollama
-server with temperature 1.0 and seed = 20261124 + sample index. The answer is parsed as the first number
-in the text, which must lie in [0, 100]. If it does not parse, the same prompt is asked again in the same
-conversation (the failed reply stays in the history), up to 2 times; after that the value is missing.
+server with temperature 1.0 and seed = 20261124 + sample index. A reply is valid only if, after stripping
+white space, it is a bare number with an optional % and an optional trailing period, and the number lies in
+[0, 100] (strict parsing, D19). Otherwise the same prompt is asked again in the same conversation (the failed
+reply stays in the history, same seed), up to 2 times; after that the value is missing.
 
 Output: data/llm_answers/answers.csv, append-only and resumable. One row per (model, prompt_id, term, sample);
 rows already present are skipped, so an interrupted run continues where it stopped. Missing answers are rows
@@ -13,6 +14,8 @@ row, and a run refuses to append answers for a tag whose digest differs from row
 
     python -I experiments/words/elicit_llm.py              # real run (Ollama must be running)
     python -I experiments/words/elicit_llm.py --dry-run    # fake model, writes data/processed/
+    python -I experiments/words/elicit_llm.py --requeue-invalid   # move pre-D19 accepted rows that fail
+                                                                  # strict parsing to superseded.csv
 """
 from __future__ import annotations
 
@@ -20,6 +23,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -32,6 +36,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = Path(__file__).with_name('models.yaml')
 OUT = ROOT / 'data/llm_answers/answers.csv'
+SUPERSEDED_NAME = 'superseded.csv'  # next to the answers file
 DRY_RUN_OUT = ROOT / 'data/processed/llm_answers_dryrun.csv'
 
 # The 19 CAPphrase terms, spelled as in data/raw/capphrase/absolute_judgements.csv (checked by a test).
@@ -54,7 +59,8 @@ NUM_PREDICT = 64  # cap on generated tokens; a single number needs far fewer
 TIMEOUT_S = 300
 
 COLUMNS = ['model', 'digest', 'prompt_id', 'term', 'sample', 'raw_text', 'value', 'attempts', 'timestamp']
-NUMBER = re.compile(r'(?<![\d.])-?\d+(?:\.\d+)?')
+BARE_NUMBER = re.compile(r'^(-?\d+(?:\.\d+)?)\s*%?\s*\.?$')  # D19
+REQUEUE_REASON = 'D19: raw_text is not a bare number in [0, 100]'
 
 
 def prompt_text(prompt_id: str, term: str) -> str:
@@ -67,11 +73,11 @@ def prompt_text(prompt_id: str, term: str) -> str:
 
 
 def parse_value(text: str | None) -> float | None:
-    """First number in the text; valid only if it lies in [0, 100]. '70-80' -> 70, 'N/A' -> None."""
-    m = NUMBER.search(text or '')
+    """Strict parsing (D19): '70', '70%', ' 72.5 ', '70.' -> number; '## Step 1: ...', '70-80', 'about 70' -> None."""
+    m = BARE_NUMBER.match((text or '').strip())
     if m is None:
         return None
-    value = float(m.group())
+    value = float(m.group(1))
     return value if 0 <= value <= 100 else None
 
 
@@ -126,7 +132,7 @@ class FakeClient:
         key = json.dumps([model, messages, seed]).encode()
         h = int.from_bytes(hashlib.sha256(key).digest()[:8], 'big')
         v = h % 101
-        return [f'{v}', f'About {v}%', f'{v}-{min(v + 10, 100)}', 'N/A'][(h >> 8) % 4]
+        return [f'{v}', f'{v}%', f'About {v}%', '## Step 1: Understand the phrase'][(h >> 8) % 4]
 
 
 def normalise_tag(tag: str) -> str:
@@ -157,6 +163,72 @@ def read_existing(out: Path) -> tuple[set, dict[str, str]]:
             if digests.setdefault(r['model'], r['digest']) != r['digest']:
                 raise SystemExit(f'{out}: several digests for {r["model"]}')
     return done, digests
+
+
+def requeue_invalid(out: Path, log=print) -> dict[tuple, int]:
+    """Move accepted rows whose raw_text fails strict parsing (D19) from ``out`` to superseded.csv.
+
+    Rows are never edited: each moved row is appended unchanged to superseded.csv with a reason column, then
+    ``out`` is rewritten without it, so a normal run re-requests exactly those keys. Rows that are already
+    missing (all attempts failed the old, looser rule, hence also the strict one) are the strict outcome and stay.
+    Kept rows must parse to their stored value. Returns the moved count per (model, prompt_id, term).
+    """
+    if not out.is_file():
+        raise SystemExit(f'{out} does not exist')
+    with out.open(newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames != COLUMNS:
+            raise SystemExit(f'{out}: unexpected header {reader.fieldnames}')
+        rows = list(reader)
+    keep, move = [], []
+    for r in rows:
+        value = parse_value(r['raw_text'])
+        if value is None and r['value'] != '':
+            move.append(r)
+            continue
+        if value is not None and r['value'] != f'{value:g}':
+            raise SystemExit(f'{out}: stored value {r["value"]} differs from strict parse {value} for {r}')
+        keep.append(r)
+
+    counts: dict[tuple, int] = {}
+    for r in move:
+        k = (r['model'], r['prompt_id'], r['term'])
+        counts[k] = counts.get(k, 0) + 1
+    n_missing = sum(1 for r in keep if r['value'] == '')
+    log(f'{len(rows)} rows in {out}: {len(move)} to requeue, {len(keep)} kept '
+        f'({n_missing} already missing after all attempts)')
+    for (model, pid, term), n in sorted(counts.items()):
+        log(f'  {model}\t{pid}\t{term}\t{n}')
+    if not move:
+        return counts
+
+    sup = out.with_name(SUPERSEDED_NAME)
+    sup_cols = COLUMNS + ['reason']
+    seen = set()
+    if sup.is_file() and sup.stat().st_size:
+        with sup.open(newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            if reader.fieldnames != sup_cols:
+                raise SystemExit(f'{sup}: unexpected header {reader.fieldnames}')
+            seen = {tuple(r[c] for c in COLUMNS) for r in reader}
+    new_sup = not sup.is_file() or sup.stat().st_size == 0
+    with sup.open('a', newline='', encoding='utf-8') as f:  # append first: a crash never loses a row
+        w = csv.writer(f)
+        if new_sup:
+            w.writerow(sup_cols)
+        for r in move:
+            if tuple(r[c] for c in COLUMNS) not in seen:  # rerun after a crash between the two writes
+                w.writerow([r[c] for c in COLUMNS] + [REQUEUE_REASON])
+        f.flush()
+        os.fsync(f.fileno())
+    tmp = out.with_suffix(out.suffix + '.tmp')
+    with tmp.open('w', newline='', encoding='utf-8') as f:
+        w = csv.writer(f)
+        w.writerow(COLUMNS)
+        w.writerows([r[c] for c in COLUMNS] for r in keep)
+    os.replace(tmp, out)
+    log(f'Moved {len(move)} rows to {sup}; rerun without --requeue-invalid to request them again')
+    return counts
 
 
 def run(models: list[str], client, out: Path, prompt_ids=PROMPT_IDS, terms=TERMS,
@@ -210,8 +282,14 @@ def main(argv=None) -> int:
     ap.add_argument('--out', type=Path)
     ap.add_argument('--dry-run', action='store_true', help='use a fake model; never touches the real output')
     ap.add_argument('--models', nargs='+', help='subset of the configured models')
+    ap.add_argument('--requeue-invalid', action='store_true',
+                    help='move accepted rows that fail strict parsing (D19) to superseded.csv, then exit')
     ap.add_argument('--samples', type=int, default=N_SAMPLES, help='samples per term (plan: 50; smaller only to test)')
     args = ap.parse_args(argv)
+
+    if args.requeue_invalid:
+        requeue_invalid(args.out or OUT)
+        return 0
 
     cfg = load_config(args.config)
     models = args.models or list(cfg['models'])
