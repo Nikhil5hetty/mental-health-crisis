@@ -1,0 +1,25 @@
+field,category,n,share
+country,United Kingdom,2018,0.39002705836876689
+country,United States,1436,0.27754155392346347
+country,other,1000,0.1932740626207963
+country,missing,720,0.13915732508697332
+education,Postgraduate,2699,0.52164669501352923
+education,Bachelor,1437,0.27773482798608429
+education,Some college,263,0.050831078469269424
+education,High school,103,0.019907228449942017
+education,Less than high school,9,0.0017394665635871666
+education,missing,663,0.12814070351758794
+english_background,English is my first language,3993,0.77174333204483958
+english_background,English is not my first language but I am fluent,720,0.13915732508697332
+english_background,English is not my first language and I am not fluent,40,0.0077309625048318517
+english_background,missing,421,0.081368380363355239
+age_band,35-44,1405,0.27155005798221876
+age_band,45-54,1163,0.22477773482798608
+age_band,25-34,868,0.16776188635485118
+age_band,55-64,734,0.14186316196366447
+age_band,65-74,328,0.063393892539621188
+age_band,18-24,141,0.027251642829532276
+age_band,75+,79,0.015268650947042908
+age_band,Under 18,19,0.0036722071897951295
+age_band,missing,437,0.084460765365287974
+all,respondents,5174,1
