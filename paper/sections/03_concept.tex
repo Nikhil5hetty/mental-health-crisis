@@ -33,7 +33,7 @@ caused by the meaning of the words alone.
   \draw[->] (reply) -| (rules);
 \end{tikzpicture}
 \caption{The crisis-line \Perc{}. Encoder: point data are turned into interval type-2 word models (one codebook from
-citizens, one from LLMs). Engine and decoder: the crisis degree is put into a risk word with the codebook, and the risk
+survey respondents, one from LLMs). Engine and decoder: the crisis degree is put into a risk word with the codebook, and the risk
 word and the reply word select a service action.}
 \label{fig:pipeline}
 \end{figure}
@@ -41,6 +41,8 @@ word and the reply word select a service action.}
 \subsection{Encoder: IT2 Word Models from Point Data}
 \label{sec:concept-encoder}
 
+We use \emph{citizen codebook} for the word models built from survey respondents; ``citizen'' marks the service-user
+side of the comparison, not nationality or residence.
 All word models live on the probability scale $X = \{0, 0.5, 1, \dots, 100\}$.
 For a sample of numbers $v_1, \dots, v_n$ that people (or a model) give for a word, we summarise the sample by its
 quantiles $q_{0.05}, q_{0.25}, q_{0.75}, q_{0.95}$ and define a T1 \emph{quantile trapezoid}
@@ -63,7 +65,7 @@ For a family of T1 sets $\mu_1, \dots, \mu_K$ of the same word, the IT2 word mod
 \label{eq:envelope}
 \end{equation}
 with UMF $\overline{\mu}$ and LMF $\underline{\mu}$.
-For citizens, the family consists of one trapezoid per demographic group (Section~\ref{sec:design}); for LLMs, of one
+For the citizen codebook, the family consists of one trapezoid per demographic group of respondents (Section~\ref{sec:design}); for LLMs, of one
 trapezoid per model.
 A group or model enters the envelope for a word only if it gave at least \WMinN{} valid numbers for that word.
 
@@ -134,7 +136,7 @@ J(A, B) = \frac{\sum_{x} \min(\overline{\mu}_A, \overline{\mu}_B) + \min(\underl
 \end{equation}
 measures overlap; for T1 sets it reduces to the usual fuzzy Jaccard index.
 The \emph{centre shift} is the difference between the centres of the two sets, in percentage points.
-The \emph{width ratio} compares the interquartile ranges (IQR) of the underlying numbers, LLM over citizens, so that a
+The \emph{width ratio} compares the interquartile ranges (IQR) of the underlying numbers, LLM over respondents, so that a
 ratio below one means that the LLMs use the word more narrowly.
 The \emph{action flip rate} is the share of messages for which the two codebooks lead to different actions, split into
 under-escalation (the LLM codebook gives the less urgent action) and over-escalation.

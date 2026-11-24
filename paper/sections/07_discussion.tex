@@ -1,5 +1,100 @@
-%% To be written in PR B.
 \section{Discussion}
 \label{sec:discussion}
 
-To be written in PR B.
+\subsection{Reading the Results through Turing, Popper and Occam}
+\label{sec:disc-mendel}
+
+Mendel's three principles (Section~\ref{sec:bg-cww}) give a compact reading of the results.
+In the sense of \emph{Turing}, an LLM codebook is adequate if its word meanings cannot be told apart from those of
+the people it serves.
+In the middle of the scale, LLM meanings overlap moderately with those of respondents; for several extremes and negations
+they clearly fail this test:
+a reader who receives \word{Will Happen} or \word{Improbable} from the LLMs would reconstruct a number far from what
+respondents mean (Section~\ref{sec:res-rq2}).
+The upward shift of negative phrases matches the bias that a recent comparison of many LLMs reports for
+\word{unlikely} and \word{improbable} \citep{petridis2026unlikely}, which suggests that it is not specific to our four
+models.
+
+In the sense of \emph{Popper}, a T1 word model is an incorrect theory of a word because it is completely certain once
+its parameters are fixed.
+Several LLM word models are more certain still: in \WtwoCollapsesPOne{} of \WtwoCellsPOne{} cells a model gave one fixed
+number, even at temperature \WTemperature{}, and its word model is a point.
+Such a model cannot represent that a word means different things to different people, and the IT2 envelope over models
+is the minimal correction: it keeps the disagreement between models as a footprint instead of averaging it away.
+
+In the sense of \emph{Occam}, the simpler of two models should be chosen when both give the same results.
+Excluding inattentive respondents gives almost the same citizen codebook (Section~\ref{sec:res-rq1}), so the simpler
+codebook without the exclusion suffices.
+Occam does not decide between rules or codebooks that give different results.
+The primary nearest-centre fallback and the post-hoc neighbour fallback lead to different flip rates
+(\WthreeActionFlipRateLlmVsCitizen{} against \WthreePosthocBSevereNeighbourFallbackActionFlipRateLlmVsCitizen{}), so the
+choice between them is a design decision about how a service should act where no word fits, and the same holds for the
+choice between the citizen and the LLM codebook.
+
+\subsection{Why Extremes Diverge More than Hedges}
+\label{sec:disc-shape}
+
+H2a expected the opposite of what we found.
+We read the reversal as an effect of the shape of the sets rather than of their position; the study does not test
+this explanation directly.
+Respondents use extreme phrases narrowly: their word models are thin shoulders close to $0$ or $100$, sometimes nearly
+points.
+LLMs also answer extreme phrases with one or a few round numbers, but not always the same ones; a point set that is a
+few percentage points away from a narrow citizen set has almost no overlap, so the Jaccard similarity drops sharply.
+Hedge phrases are wide for respondents, and a narrower LLM set placed anywhere inside them still overlaps substantially.
+A small error in position therefore costs more overlap at the extremes than in the middle, and narrowness alone (H2b)
+does not make LLM meanings worse for hedges.
+For a service, this matters because the extreme words are exactly the ones that trigger the strongest actions.
+
+\subsection{Implications: Codebook Governance}
+\label{sec:disc-governance}
+
+If a public service lets an AI system communicate urgency in words, the meanings of those words become part of the
+service.
+Our results show that the meanings an LLM brings are not those of the people it serves, that they can have gaps (the LLM
+codebook covers no level word between \WthreeLlmGapLow{} and \WthreeLlmGapHigh{}), and that the difference can change
+whether a helpline is suggested.
+We therefore argue for \emph{codebook governance}: a service should define its risk words with the people it serves,
+publish the resulting codebook, test the system's use of the words against it, and repeat the test when the model
+changes.
+In a cognitive city, such a codebook is public data in the sense of Spycher and Portmann: a fuzzy, linguistic
+category system that should be maintained openly rather than fixed crisply by the system builder
+\citep{spycher2026crispness}.
+The \Perc{} makes this practical, because the codebook is a separate, exchangeable component, and the word-meaning lab
+shows how the result can be explained to non-experts.
+On this data set, the word mismatch changes whether a helpline is suggested, never whether a human is involved; this is
+reassuring for the escalation to people that both 143 and 113 require, but it also shows where a mismatch is most likely
+to go unnoticed.
+
+\subsection{Limitations}
+\label{sec:disc-limitations}
+
+\begin{itemize}
+\item \textbf{Point data, not intervals.} CAPphrase records one number per respondent and phrase. Our FOU therefore
+captures disagreement between demographic groups, not the uncertainty of individuals about a word
+(Section~\ref{sec:concept-encoder}). Interval data would allow the IA or EIA.
+\item \textbf{Language and respondents.} The phrases are English, and most respondents live in the United Kingdom or the
+United States and hold a university degree. The codebook is not that of the users of a Swiss crisis line, who mostly
+speak German, French or Italian.
+\item \textbf{Models and sampling.} We tested four small open-weight models locally, with two prompts and one
+temperature. Larger or commercial models, other prompts and other temperatures may mean different things, and model
+updates can change the codebook.
+\item \textbf{Decision design.} The mapping of crisis levels to the four survey words, the rule table and the fallback
+are design choices; the rule table is not clinically validated. The crisis degree is the share of LLM labellers, not a
+validated risk score, and it takes only a few distinct values.
+\item \textbf{Messages.} The BHH messages come from public mental-health datasets, not from crisis-line conversations,
+and the reply words come from LLM judges.
+\item \textbf{Inference.} All tests are exploratory and uncorrected for multiplicity, the fallback sensitivity analyses
+are post hoc, and the number of flips is small.
+\end{itemize}
+
+\subsection{Ethics}
+\label{sec:disc-ethics}
+
+The study uses public data only: aggregate survey data under an open licence, help-seeking messages from a research
+data set used without redistribution and without quoting any message, and answers that we generated from local models.
+No person was contacted, and all reported results are aggregates.
+The prototype is a research tool; it states on every page that its rules are not clinically validated, and it must not
+be used to make decisions about real people in crisis.
+A system that suggests a helpline less often to people whose message is ambiguous can harm them; we see the main
+ethical contribution of the study in making such effects measurable before deployment.

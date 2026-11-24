@@ -176,6 +176,7 @@ def words_rq1(m: Macros) -> None:
           'results/words/rq1/metrics.csv:n_group_excluded')
     areas = met[met.metric == 'fou_area'].set_index('term').value
     m.add('WoneWidestTerm', areas.idxmax(), 'results/words/rq1/metrics.csv:max fou_area')
+    m.add('WoneMeanFouArea', fmt_num(areas.mean(), 2), 'results/words/rq1/metrics.csv:mean fou_area')
     m.add('WoneNarrowestTerm', areas.idxmin(), 'results/words/rq1/metrics.csv:min fou_area')
 
     prof = pd.read_csv(W / 'rq1/respondent_profile.csv')
@@ -248,6 +249,13 @@ def words_rq3(m: Macros) -> None:
         m.add('WthreeNFallback' + camel(col[len('fallback_'):]), fmt_int(t[col].sum()), f'{src}:sum {col}')
     m.add('WthreeMinObserved', str(int(t.n_llm_observed.min())), f'{src}:min n_llm_observed')
     m.add('WthreeMaxObserved', str(int(t.n_llm_observed.max())), f'{src}:max n_llm_observed')
+    llm = pd.read_csv(W / 'rq2/codebooks/llm_it2.csv')
+    llm = llm[(llm.prompt == 'P1') & (llm.umf > 0)]
+    end_none = llm[llm.term == 'Remote Chance'].x.max()
+    start_possible = llm[llm.term == 'Realistic Possibility'].x.min()
+    m.add('WthreeLlmGapLow', f'{end_none:g}', 'results/words/rq2/codebooks/llm_it2.csv:P1 Remote Chance max x with umf>0')
+    m.add('WthreeLlmGapHigh', f'{start_possible:g}', 'results/words/rq2/codebooks/llm_it2.csv:P1 Realistic Possibility min x with umf>0')
+    m.add('WthreeNGapThreeThree', str(int((t.m.round(6) == round(100 / 3, 6)).sum())), f'{src}:items with m = 100/3')
     m.add('WthreeNZeroOrHundred', fmt_int(t.m.isin([0, 100]).sum()), f'{src}:m in {{0, 100}}')
 
 
