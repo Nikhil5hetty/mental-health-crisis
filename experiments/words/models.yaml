@@ -1,0 +1,9 @@
+# LLM elicitation config (docs/ANALYSIS_PLAN_WORDS.md, RQ2). Edit before running if needed.
+# Tags must be pulled in Ollama first (`ollama pull <tag>`). The digest of each tag is read from
+# /api/tags at run time and stored with every answer; a run refuses to mix digests for one tag.
+base_url: http://localhost:11434
+models:
+  - llama3.1:8b
+  - qwen2.5:7b
+  - gemma2:9b
+  - mistral:7b
