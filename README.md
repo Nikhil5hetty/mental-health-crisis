@@ -145,6 +145,8 @@ reads only the committed aggregate results in `results/words/`.
 .venv/bin/streamlit run app/word_lab.py
 ```
 
+Reference environment: **Python 3.12** with the pins in `requirements.txt`.
+
 Installation manual, user manual and known limitations: [app/README.md](app/README.md). Usability
 self-evaluation: [docs/USABILITY.md](docs/USABILITY.md).
 

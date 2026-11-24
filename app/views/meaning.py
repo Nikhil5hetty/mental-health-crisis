@@ -2,10 +2,9 @@
 import altair as alt
 import streamlit as st
 
-from src.app import logic
+from src.app import charts, logic
 
-BLUE, ORANGE, GREY = '#2a78d6', '#eb6834', '#8a8984'
-MODEL_COLOURS = ['#1baf7a', '#eda100', '#e87ba4', '#6250d6']  # fixed order, one per model
+BLUE, ORANGE, GREY = charts.BLUE, charts.ORANGE, charts.GREY
 
 
 @st.cache_data(show_spinner=False)
@@ -49,35 +48,16 @@ with tab_one:
         st.warning(f'Left out for this word (fewer than 30 valid answers): {", ".join(s["excluded_models"])}.')
 
     bands, lines = logic.term_curves(d, term, show_groups=show_groups, show_models=show_models)
-    x = alt.X('x:Q', title='Probability (%)', scale=alt.Scale(domain=[0, 100]))
-    band = alt.Chart(bands).mark_area(opacity=.35).encode(
-        x=x, y=alt.Y('lo:Q', title='Membership', scale=alt.Scale(domain=[0, 1.05])), y2='hi:Q',
-        color=alt.Color('series:N', title='Band', scale=alt.Scale(domain=list(bands.series.unique()), range=[BLUE, ORANGE])),
-        tooltip=['series:N', alt.Tooltip('x:Q', title='%'), alt.Tooltip('lo:Q', format='.2f', title='lower'),
-                 alt.Tooltip('hi:Q', format='.2f', title='upper')])
-    layers = [band]
-    models = lines[lines.kind == 'model']
-    if len(models):
-        names = sorted(models.series.unique())
-        layers.append(alt.Chart(models).mark_line(strokeWidth=2).encode(
-            x=x, y='mu:Q',
-            stroke=alt.Stroke('series:N', title='LLM', scale=alt.Scale(domain=names, range=MODEL_COLOURS[:len(names)])),
-            tooltip=['series:N', alt.Tooltip('x:Q', title='%'), alt.Tooltip('mu:Q', format='.2f', title='membership')]))
-    groups = lines[lines.kind == 'citizen group']
-    if len(groups):
-        layers.append(alt.Chart(groups).mark_line(strokeWidth=1, color=BLUE, opacity=.8).encode(
-            x=x, y='mu:Q', detail='series:N',
-            tooltip=[alt.Tooltip('series:N', title='Citizen group'), alt.Tooltip('x:Q', title='%'),
-                     alt.Tooltip('mu:Q', format='.2f', title='membership')]))
-    st.altair_chart(alt.layer(*layers).resolve_scale(color='independent', stroke='independent').properties(height=360),
-                    width='stretch')
+    st.altair_chart(charts.word_chart(bands, lines), width='stretch')
+    st.caption('Solid outlines show where the word applies: the outer line is the widest group or model, the inner '
+               'line is where they all agree. Light shading between the lines shows disagreement.')
 
     with st.expander('How to read this', expanded=False):
         st.markdown(
-            '- **Blue band**: citizens. Its lower and upper edges come from 6 demographic groups; a wide band '
-            'means the groups disagree.\n'
-            '- **Orange band**: the four LLMs together (question P1, 50 answers each).\n'
-            '- **Coloured lines**: one LLM each. A tall thin spike means the model always gives the same number.\n'
+            '- **Blue outlines**: citizens. The outer (upper) line is the widest of the 6 demographic groups; the '
+            'inner (lower) line is where all 6 agree. Shading between them shows the groups disagree.\n'
+            '- **Orange outlines**: the four LLMs together (question P1, 50 answers each), read the same way.\n'
+            '- **Dashed lines**: one LLM each. A tall thin spike means the model always gives the same number.\n'
             '- **Overlap (Jaccard)** compares the two bands; **centre shift** compares where they sit.\n'
             '- Ranges in brackets are 95% bootstrap confidence intervals from the study.')
     with st.expander('Per-model details'):

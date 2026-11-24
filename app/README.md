@@ -18,11 +18,12 @@ touches raw data, so it starts in about a second and contains no licensed survey
 
 ## Installation manual
 
-**Requirements:** Python 3.11 or newer, and the repository checked out with its `results/words/` folder.
+**Requirements:** **Python 3.12** (the reference environment for this project), and the repository checked
+out with its `results/words/` folder.
 
 ```bash
 git clone <repository> && cd mental-health-crisis
-python3 -m venv .venv
+python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt     # includes streamlit==1.67.0
 .venv/bin/streamlit run app/word_lab.py
 ```
@@ -30,9 +31,12 @@ python3 -m venv .venv
 Streamlit prints a local address (normally http://localhost:8501) and opens it in your browser.
 Stop the app with `Ctrl+C`.
 
-**Tested environment:** macOS (Apple silicon), Python 3.15.2, streamlit 1.67.0, altair 6.3.0, pandas 3.1.1,
-numpy 2.5.5, pyarrow 26.0.1. **Python 3.15 note:** the pinned `pyarrow==22.0.0` in `requirements.txt` has no
-wheel for Python 3.15 and fails to build. On 3.15, install the app's packages without that pin:
+**Reference environment:** Python 3.12 with the pins in `requirements.txt`. The WP8 reproducibility check runs
+there. The app itself was developed and tested on macOS (Apple silicon) with Python 3.15.2, streamlit 1.67.0,
+altair 6.3.0, pandas 3.1.1, numpy 2.5.5 and pyarrow 26.0.1.
+
+**Python 3.15 workaround:** the pinned `pyarrow==22.0.0` in `requirements.txt` has no wheel for Python 3.15 and
+fails to build. On 3.15, install the app's packages without that pin:
 
 ```bash
 .venv/bin/python -m pip install streamlit==1.67.0 numpy pandas matplotlib PyYAML pytest
@@ -63,11 +67,12 @@ Use the left sidebar to switch between the two pages.
 1. **Pick a probability word** in the drop-down menu (default: "Likely").
 2. Read the **chart**. The horizontal axis is a probability from 0 to 100 %. The height (*membership*, 0 to 1)
    shows how well each number fits the word.
-   - **Blue band:** citizens. Its lower and upper edges come from six demographic groups (native or non-native
-     English speakers, in three age bands). A wide band means the groups disagree.
-   - **Orange band:** the four LLMs together (question wording P1, 50 answers per model).
-   - **Coloured lines:** one LLM each. A tall thin spike means the model gave the same number almost every time
-     (a *collapsed* model).
+   - **Blue outlines:** citizens. The outer (upper) line is the widest of six demographic groups (native or
+     non-native English speakers, in three age bands); the inner (lower) line is where all six agree. Light
+     shading between the lines shows disagreement. The citizen band is drawn on top, so it is never hidden.
+   - **Orange outlines:** the four LLMs together (question wording P1, 50 answers per model), read the same way.
+   - **Dashed coloured lines:** one LLM each. A tall thin spike means the model gave the same number almost every
+     time (a *collapsed* model).
 3. Use the **toggles** to show or hide each LLM's line and the six citizen-group lines.
 4. Read the three **headline numbers**:
    - **Overlap (Jaccard):** 0 means the two bands do not overlap, 1 means they are identical.
@@ -141,6 +146,7 @@ A test checks that the simulator reproduces the committed RQ3 decisions for all 
   the flips shown (see `results/words/rq3/SUMMARY.md`, post-hoc section).
 - **Group lines** are T1 sets of six demographic groups only. Smaller groups such as under-18s or a missing
   age are not shown.
+- **Python version:** the pinned environment targets Python 3.12. Other versions may need the workaround above.
 - **Uncertainty** is shown as 95 % bootstrap intervals from the study. The app does not recompute them.
 - **Accessibility:** colours come from a reference categorical palette designed for colour-vision deficiencies,
   but this exact combination has not been re-validated. Every series is also named in a legend and tooltip, so

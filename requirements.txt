@@ -1,3 +1,5 @@
+# Reference environment: Python 3.12 (WP6 ruling; verified in WP8). Pins below target 3.12.
+# Python 3.15: pyarrow==22.0.0 has no wheel; see app/README.md for the documented workaround.
 huggingface_hub==0.36.0
 pandas==2.3.3
 pyarrow==22.0.0

@@ -18,6 +18,7 @@ from src.cww import APPROPRIATENESS_WORDS
 from src.cww.rules import ACTIONS
 from src.cww.verbalise import CITIZEN, LEVELS, LLM, LLM_PROMPT, SEVERITY, action, load_codebooks, memberships, verbalise
 from src.cww.centroid import centre
+from src.app.charts import CITIZEN_BAND, LLM_BAND
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RESULTS = ROOT / 'results/words'
@@ -131,8 +132,8 @@ def term_curves(data: WordData, term: str, show_groups: bool = False, show_model
     c = data.citizen[data.citizen.term == term]
     l = data.llm_it2[data.llm_it2.term == term]
     bands = pd.concat([
-        pd.DataFrame({'x': c.x, 'series': 'Citizens (band over 6 groups)', 'lo': c.lmf, 'hi': c.umf}),
-        pd.DataFrame({'x': l.x, 'series': 'LLMs (band over models)', 'lo': l.lmf, 'hi': l.umf}),
+        pd.DataFrame({'x': c.x, 'series': CITIZEN_BAND, 'lo': c.lmf, 'hi': c.umf}),
+        pd.DataFrame({'x': l.x, 'series': LLM_BAND, 'lo': l.lmf, 'hi': l.umf}),
     ], ignore_index=True)
     parts = []
     if show_models:

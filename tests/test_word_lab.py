@@ -261,3 +261,44 @@ def test_app_runs_on_committed_results(monkeypatch):
     assert not at.exception
     at.switch_page('views/simulator.py').run()
     assert not at.exception and any('9 of 190' in c.value for c in at.caption)
+
+
+# --------------------------------------------------------------------------- word chart (PM review fix)
+
+from src.app import charts  # noqa: E402
+
+
+def _layer_data(chart, name):
+    spec = chart.to_dict()
+    layer = next(l for l in spec['layer'] if l.get('name') == name)
+    return spec['datasets'][layer['data']['name']], layer
+
+
+def test_word_chart_draws_both_outlines_with_citizens_on_top(results):
+    d = logic.load_word_data(results)
+    bands, lines = logic.term_curves(d, 'Likely', show_groups=True)
+    chart = charts.word_chart(bands, lines)
+    assert charts.layer_names(chart) == charts.LAYER_ORDER          # citizen fill and outlines drawn last
+    for name, series in [('citizen_outline', charts.CITIZEN_BAND), ('llm_outline', charts.LLM_BAND)]:
+        rows, layer = _layer_data(chart, name)
+        assert layer['mark']['type'] == 'line'
+        assert {r['series'] for r in rows} == {series}
+        assert {r['edge'] for r in rows} == {'upper edge (UMF)', 'lower edge (LMF)'}
+    for name in ['citizen_fill', 'llm_fill']:
+        _, layer = _layer_data(chart, name)
+        assert layer['mark']['opacity'] == charts.FILL_OPACITY <= .2
+    no_lines = charts.word_chart(bands, lines.iloc[0:0])
+    assert charts.layer_names(no_lines) == ['llm_fill', 'llm_outline', 'citizen_fill', 'citizen_outline']
+
+
+@pytest.mark.skipif(not (REAL / 'rq1/codebooks/citizen_it2.csv').is_file(), reason='committed results not present')
+def test_likely_citizen_core_is_visible_in_the_plotted_outline():
+    """'Likely': citizen UMF reaches 1 inside 67-80, and that outline is what the chart plots."""
+    d = logic.load_word_data(REAL)
+    bands, lines = logic.term_curves(d, 'Likely')
+    rows, _ = _layer_data(charts.word_chart(bands, lines), 'citizen_outline')
+    upper = pd.DataFrame([r for r in rows if r['edge'] == 'upper edge (UMF)'])
+    core = upper[(upper.x >= 67) & (upper.x <= 80)]
+    assert (core.mu == 1).any()
+    lower = pd.DataFrame([r for r in rows if r['edge'] == 'lower edge (LMF)'])
+    assert len(upper) == len(lower) == len(X)

@@ -1,6 +1,7 @@
 # Usability: heuristic self-evaluation of the word-meaning lab (WP6)
 
-**Status: draft written by Claude Code (WP6) for the team to review, amend and sign off.**
+**Status: DRAFT.** Written by Claude Code (WP6). It stays a draft until Nikhil and Rajeshwar have reviewed it
+(PM ruling on PR #32).
 
 Method: a walk-through of both pages of `app/word_lab.py` (v. WP6, 2026-11-24) against Nielsen's ten
 usability heuristics (Nielsen 1994, *Enhancing the explanatory power of usability heuristics*, CHI '94). One line
