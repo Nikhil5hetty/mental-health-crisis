@@ -27,23 +27,18 @@ import numpy as np
 import pandas as pd
 from src.cww import APPROPRIATENESS_WORDS
 from src.cww.centroid import centre
-from src.cww.rules import ACTIONS, CRISIS_WORDS, RULE_TABLE, crisp_memberships, infer
-from src.cww.sets import IT2Set
+from src.cww.rules import ACTIONS
+# The verbalisation rule lives in src so that the word-meaning lab app applies exactly the same code.
+from src.cww.verbalise import (CITIZEN, LEVELS, LLM, LLM_PROMPT, SEVERITY, MissingCodebook, action,  # noqa: F401
+                               memberships, more_severe, neighbour_fallback, verbalise)
+from src.cww.verbalise import load_codebooks as _load_codebooks
 
 SEED = 20261124
 B = 1000
 N_ITEMS = 190
-LLM_PROMPT = 'P1'
-LEVELS = {'None': 'Remote Chance', 'Possible': 'Realistic Possibility', 'Likely': 'Likely', 'Clear': 'Almost Certain'}
-SEVERITY = list(LEVELS)  # increasing severity, same order as rules.CRISIS_WORDS
-CITIZEN, LLM = 'citizen', 'llm'
 RQ1_BOOKS = ROOT / 'results/words/rq1/codebooks'
 RQ2_BOOKS = ROOT / 'results/words/rq2/codebooks'
 METRICS = ['word_disagreement_rate', 'action_flip_rate', 'under_escalation_rate', 'over_escalation_rate']
-
-
-class MissingCodebook(SystemExit):
-    pass
 
 
 # ----------------------------------------------------------------------------- inputs
@@ -66,96 +61,10 @@ def load_items(rq2_per_item=ROOT / 'results/rq2/per_item.csv', bhh_root=None):
     return items.sort_values('item_id').reset_index(drop=True)
 
 
-def _book(frame, lmf='lmf', umf='umf'):
-    book = {}
-    for level, word in LEVELS.items():
-        rows = frame[frame.term == word].sort_values('x')
-        if rows.empty:
-            raise ValueError(f'Codebook lacks the level word {word!r}')
-        book[level] = IT2Set(rows.x.to_numpy(float), rows[lmf].to_numpy(float), rows[umf].to_numpy(float))
-    return book
-
-
 def load_codebooks(rq1=RQ1_BOOKS, rq2=RQ2_BOOKS, prompt=LLM_PROMPT):
-    """{codebook name: {level: IT2Set}}: citizen IT2, LLM IT2 and each citizen group's T1 (UMF = LMF)."""
-    llm_path = Path(rq2) / 'llm_it2.csv'
-    if not llm_path.exists():
-        raise MissingCodebook(f'LLM codebook not found: {llm_path}. RQ3 needs the WP4 (RQ2) results; '
-                              'run experiments/words/run_rq2.py or merge WP4 first.')
-    llm = pd.read_csv(llm_path)
-    if 'prompt' in llm:
-        llm = llm[llm.prompt == prompt]
-    books = {CITIZEN: _book(pd.read_csv(Path(rq1) / 'citizen_it2.csv')), LLM: _book(llm)}
-    groups = pd.read_csv(Path(rq1) / 'group_t1.csv')
-    for group, frame in groups.groupby('group', sort=True):
-        books[group] = _book(frame, lmf='mu', umf='mu')
-    return books
+    """{codebook name: {level: IT2Set}} (src/cww/verbalise.load_codebooks with the committed result paths)."""
+    return _load_codebooks(rq1, rq2, prompt)
 
-
-# ----------------------------------------------------------------------------- verbalisation
-
-def memberships(m, book):
-    """(UMF + LMF) / 2 of each level word at m, linear interpolation on the codebook grid."""
-    out = {}
-    for level, s in book.items():
-        if not s.x[0] <= m <= s.x[-1]:
-            raise ValueError(f'm = {m} outside the codebook universe')
-        out[level] = float(np.interp(m, s.x, (s.umf + s.lmf) / 2))
-    return out
-
-
-def more_severe(levels):
-    return max(levels, key=SEVERITY.index)
-
-
-def neighbour_fallback(m, book):
-    """POST-HOC alternative fallback: the more severe of the two words neighbouring m.
-
-    Support of a word = grid points with (UMF + LMF) / 2 > 0. Left neighbour = word whose support ends
-    closest below m; right neighbour = word whose support starts closest above m (ties: more severe).
-    At an end of the scale only one neighbour exists and is chosen.
-    """
-    left, right = {}, {}
-    for level, s in book.items():
-        x = s.x[(s.umf + s.lmf) / 2 > 0]
-        if x.size == 0:
-            raise ValueError(f'Level word {level!r} has empty support')
-        if x[-1] < m:
-            left[level] = x[-1]
-        elif x[0] > m:
-            right[level] = x[0]
-        else:
-            raise ValueError(f'm = {m} lies inside the support of {level!r}; no fallback needed')
-    picks = []
-    if left:
-        best = max(left.values()); picks.append(more_severe([l for l, v in left.items() if v == best]))
-    if right:
-        best = min(right.values()); picks.append(more_severe([l for l, v in right.items() if v == best]))
-    return more_severe(picks)
-
-
-def verbalise(m, book, centres=None, fallback='centre'):
-    """(level, fallback used). Max membership, ties to the more severe level; all-zero -> nearest centre
-    (primary) or, for the post-hoc sensitivity, fallback='neighbour' (more severe neighbouring word)."""
-    mu = memberships(m, book)
-    best = max(mu.values())
-    if best > 0:
-        return max((l for l in SEVERITY if mu[l] == best), key=SEVERITY.index), False
-    if fallback == 'neighbour':
-        return neighbour_fallback(m, book), True
-    if fallback != 'centre':
-        raise ValueError(f'Unknown fallback {fallback!r}')
-    centres = centres or {l: centre(book[l]) for l in SEVERITY}
-    dist = {l: abs(centres[l] - m) for l in SEVERITY}
-    nearest = min(dist.values())
-    return max((l for l in SEVERITY if dist[l] == nearest), key=SEVERITY.index), True
-
-
-def action(level, reply_word):
-    a, _ = infer(crisp_memberships(level, CRISIS_WORDS), crisp_memberships(reply_word, APPROPRIATENESS_WORDS))
-    if a != RULE_TABLE[(level, reply_word)]:
-        raise AssertionError('Max-min inference disagrees with the rule table')
-    return a
 
 
 def per_item(items, books):

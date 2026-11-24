@@ -135,6 +135,19 @@ Using the public annotation artifacts from the *Between Help and Harm* repositor
 
 **Expected runtime.** The total has not been measured yet. Each answer is a few tokens, so a 7–9B model on an Apple-silicon laptop should take roughly 0.5–1.5 s per request. With re-asks, expect about 1–3 hours for all 7,600 answers. The script prints its progress and an ETA every 100 rows.
 
+## Word-meaning lab (WP6)
+
+An interactive Streamlit prototype for the word-meaning study. It has two pages: *What does a word mean?*
+(citizen vs LLM word models) and a *Crisis-line simulator* (does the word mismatch flip the bot's action?). It
+reads only the committed aggregate results in `results/words/`.
+
+```bash
+.venv/bin/streamlit run app/word_lab.py
+```
+
+Installation manual, user manual and known limitations: [app/README.md](app/README.md). Usability
+self-evaluation: [docs/USABILITY.md](docs/USABILITY.md).
+
 ## Repository structure
 ```
 mental-health-crisis/
